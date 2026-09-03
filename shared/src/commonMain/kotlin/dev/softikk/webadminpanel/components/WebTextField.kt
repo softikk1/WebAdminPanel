@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicSecureTextField
@@ -23,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
@@ -40,10 +42,13 @@ import webadminpanel.shared.generated.resources.eye_off
 
 @Composable
 fun WebTextField(
-    state: TextFieldState, labelText: String, keyboardType: KeyboardType = KeyboardType.Text
+    modifier: Modifier = Modifier,
+    state: TextFieldState,
+    labelText: String,
+    keyboardType: KeyboardType = KeyboardType.Text
 ) {
     Box(
-        modifier = Modifier.dropShadow(
+        modifier = Modifier.height(56.dp).dropShadow(
             shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
                 radius = 6.dp,
                 offset = DpOffset(0.dp, 1.dp),
@@ -55,14 +60,14 @@ fun WebTextField(
             shape = DimensTheme.shapes.mediumShape
         ).background(
             color = MaterialTheme.colorScheme.surface
-        )
+        ), contentAlignment = Alignment.Center
     ) {
         val isPassword = keyboardType == KeyboardType.Password
         if (isPassword) {
             var showPassword by remember { mutableStateOf(true) }
             BasicSecureTextField(
-                modifier = Modifier.padding(
-                    vertical = DimensTheme.paddings.mediumPadding, horizontal = 12.dp
+                modifier = modifier.padding(
+                    horizontal = DimensTheme.paddings.mediumPadding
                 ),
                 state = state,
                 textObfuscationMode = if (showPassword) {
@@ -88,7 +93,8 @@ fun WebTextField(
                     },
                     trailingIcon = {
                         IconButton(
-                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand), onClick = {
+                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                            onClick = {
                                 showPassword = !showPassword
                             }) {
                             Icon(
@@ -105,8 +111,8 @@ fun WebTextField(
             )
         } else {
             BasicTextField(
-                modifier = Modifier.padding(
-                    vertical = DimensTheme.paddings.mediumPadding, horizontal = 12.dp
+                modifier = modifier.padding(
+                    horizontal = DimensTheme.paddings.mediumPadding
                 ),
                 state = state,
                 textStyle = MaterialTheme.typography.bodyMedium,

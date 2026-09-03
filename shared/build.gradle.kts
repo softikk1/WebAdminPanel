@@ -20,7 +20,8 @@ kotlin {
     
     sourceSets {
         commonMain.dependencies {
-            implementation("com.github.Softikk31.Webik:webik:v1.0.0")
+            implementation("io.github.softikk1:Webik:1.0.0")
+//            implementation("dev.softikk.webkit:webik:1.0.1")
             implementation(libs.androidx.navigation.compose)
 
             implementation(ktorLibs.client.core)
