@@ -33,8 +33,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dev.softikk.webadminpanel.components.WebTextField
+import dev.softikk.webadminpanel.components.WebToolbox
 import dev.softikk.webkit.Website
 import dev.softikk.webkit.components.buttons.Button
 import dev.softikk.webkit.navigation.Route
@@ -79,6 +81,9 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
 
     val navController = rememberNavController()
 
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
     val interFamily = FontFamily(
         Font(Res.font.inter, style = FontStyle.Italic),
         Font(Res.font.inter_italic, style = FontStyle.Italic)
@@ -86,7 +91,20 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
 
     Box(modifier = Modifier.padding(horizontal = DimensTheme.paddings.mediumPadding)) {
         Website(
-            theme = WebTheme(
+            header = {
+                currentRoute?.let {
+                    if (Routes.Main.route in currentRoute) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
+                        ) {
+                            WebToolbox(
+                                modifier = Modifier.padding(top = DimensTheme.paddings.smallPadding),
+                                navController = navController
+                            )
+                        }
+                    }
+                }
+            }, theme = WebTheme(
                 colorScheme = lightColorScheme(
                     background = Color(0xFFFFFFFF),
                     primary = Color(0xFF9340FF),
@@ -152,9 +170,9 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
                                         )
                                     }
                                     Button(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        onClick = {},
-                                        containerColor = MaterialTheme.colorScheme.primary
+                                        modifier = Modifier.fillMaxWidth(), onClick = {
+                                            navController.navigate(Routes.Main.Sites.route)
+                                        }, containerColor = MaterialTheme.colorScheme.primary
                                     ) {
                                         Text(
                                             text = "Далее",
@@ -207,16 +225,16 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
                                 }
                             }
                         }), Route(
-                        urlPath = Routes.Admins.route, content = {
+                        urlPath = Routes.Main.Admins.route, content = {
 
                         }), Route(
-                        urlPath = Routes.Sites.route, content = {
+                        urlPath = Routes.Main.Sites.route, content = {
 
                         }), Route(
-                        urlPath = Routes.Admins.Id.route, content = {
+                        urlPath = Routes.Main.Admins.Id.route, content = {
 
                         }), Route(
-                        urlPath = Routes.Sites.Id.route, content = {
+                        urlPath = Routes.Main.Sites.Id.route, content = {
 
                         })
                 )

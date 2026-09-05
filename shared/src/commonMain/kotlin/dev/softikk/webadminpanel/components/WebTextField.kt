@@ -40,6 +40,12 @@ import webadminpanel.shared.generated.resources.Res
 import webadminpanel.shared.generated.resources.eye
 import webadminpanel.shared.generated.resources.eye_off
 
+private val WebTextFieldHeight = 56.dp
+private val WebTextFieldBorderWidth = 1.dp
+private val WebTextFieldContentPadding = 3.dp
+private val WebTextFieldTrailingIconSize = 24.dp
+private val WebTextFieldShadowRadius = 6.dp
+
 @Composable
 fun WebTextField(
     modifier: Modifier = Modifier,
@@ -48,14 +54,14 @@ fun WebTextField(
     keyboardType: KeyboardType = KeyboardType.Text
 ) {
     Box(
-        modifier = Modifier.height(56.dp).dropShadow(
+        modifier = Modifier.height(WebTextFieldHeight).dropShadow(
             shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
-                radius = 6.dp,
+                radius = WebTextFieldShadowRadius,
                 offset = DpOffset(0.dp, 1.dp),
                 color = MaterialTheme.colorScheme.onSurface.copy(0.1f)
             )
         ).clip(DimensTheme.shapes.mediumShape).border(
-            width = 1.dp,
+            width = WebTextFieldBorderWidth,
             color = MaterialTheme.colorScheme.surfaceContainer,
             shape = DimensTheme.shapes.mediumShape
         ).background(
@@ -83,7 +89,7 @@ fun WebTextField(
                     lineLimits = TextFieldLineLimits.SingleLine,
                     outputTransformation = null,
                     interactionSource = remember { MutableInteractionSource() },
-                    contentPadding = PaddingValues(vertical = 3.dp),
+                    contentPadding = PaddingValues(vertical = WebTextFieldContentPadding),
                     placeholder = {
                         Text(
                             text = labelText,
@@ -93,12 +99,11 @@ fun WebTextField(
                     },
                     trailingIcon = {
                         IconButton(
-                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                            onClick = {
+                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand), onClick = {
                                 showPassword = !showPassword
                             }) {
                             Icon(
-                                modifier = Modifier.size(24.dp),
+                                modifier = Modifier.size(WebTextFieldTrailingIconSize),
                                 imageVector = vectorResource(
                                     if (showPassword) Res.drawable.eye_off else Res.drawable.eye
                                 ),
@@ -123,7 +128,7 @@ fun WebTextField(
                     lineLimits = TextFieldLineLimits.SingleLine,
                     outputTransformation = null,
                     interactionSource = remember { MutableInteractionSource() },
-                    contentPadding = PaddingValues(vertical = 3.dp),
+                    contentPadding = PaddingValues(vertical = WebTextFieldContentPadding),
                     placeholder = {
                         Text(
                             text = labelText,
