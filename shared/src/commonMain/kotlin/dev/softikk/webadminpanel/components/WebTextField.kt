@@ -51,7 +51,9 @@ fun WebTextField(
     modifier: Modifier = Modifier,
     state: TextFieldState,
     labelText: String,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    leadingIcon: (@Composable () -> Unit)? = null,
+    trailingIcon: (@Composable () -> Unit)? = null
 ) {
     Box(
         modifier = Modifier.height(WebTextFieldHeight).dropShadow(
@@ -129,6 +131,8 @@ fun WebTextField(
                     outputTransformation = null,
                     interactionSource = remember { MutableInteractionSource() },
                     contentPadding = PaddingValues(vertical = WebTextFieldContentPadding),
+                    leadingIcon = leadingIcon,
+                    trailingIcon = trailingIcon,
                     placeholder = {
                         Text(
                             text = labelText,
