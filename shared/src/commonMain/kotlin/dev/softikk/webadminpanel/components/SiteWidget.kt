@@ -2,13 +2,12 @@ package dev.softikk.webadminpanel.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,16 +19,26 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import dev.softikk.webadminpanel.Routes
+import dev.softikk.webadminpanel.Site
 import dev.softikk.webkit.theme.DimensTheme
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.number
 
+private val SiteWidgetShadowRadius = 6.dp
+
 @Composable
-fun SiteWidget(name: String, host: String, description: String, createAt: LocalDateTime) {
+fun SiteWidget(navController: NavHostController, site: Site) {
     Box(
-        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand).fillMaxWidth().dropShadow(
+        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand).clickable {
+            navController.navigate(
+                Routes.Main.Sites.Id(
+                    siteId = site.id
+                ).route
+            )
+        }.fillMaxWidth().dropShadow(
             shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
-                radius = 6.dp,
+                radius = SiteWidgetShadowRadius,
                 offset = DpOffset(0.dp, 1.dp),
                 color = MaterialTheme.colorScheme.onSurface.copy(0.1f)
             )
@@ -44,22 +53,22 @@ fun SiteWidget(name: String, host: String, description: String, createAt: LocalD
             verticalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
         ) {
             Text(
-                text = name,
+                text = site.name,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = host,
+                text = site.host,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = description,
+                text = site.description,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            val date = createAt.date
-            val time = createAt.time
+            val date = site.createAt.date
+            val time = site.createAt.time
             Text(
                 text = "${time.hour.formatDateTimePlusZero()}:${time.minute.formatDateTimePlusZero()} ${date.day.formatDateTimePlusZero()}.${date.month.number.formatDateTimePlusZero()}.${date.year.formatDateTimePlusZero()}",
                 style = MaterialTheme.typography.bodySmall,
