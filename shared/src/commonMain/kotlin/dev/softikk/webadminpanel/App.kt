@@ -3,12 +3,16 @@ package dev.softikk.webadminpanel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Checkbox
@@ -19,6 +23,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,6 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import dev.softikk.webadminpanel.components.AdminWidget
+import dev.softikk.webadminpanel.components.SiteWidget
 import dev.softikk.webadminpanel.components.WebTextField
 import dev.softikk.webadminpanel.components.WebToolbox
 import dev.softikk.webkit.Website
@@ -45,11 +52,32 @@ import dev.softikk.webkit.theme.Dimens
 import dev.softikk.webkit.theme.DimensTheme
 import dev.softikk.webkit.theme.Shapes
 import dev.softikk.webkit.theme.WebTheme
+import kotlinx.datetime.DateTimePeriod
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.Font
 import webadminpanel.shared.generated.resources.Res
 import webadminpanel.shared.generated.resources.inter
 import webadminpanel.shared.generated.resources.inter_italic
+import kotlin.time.Clock
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
+data class Site(
+    val id: Uuid,
+    val name: String,
+    val host: String,
+    val description: String,
+    val createAt: LocalDateTime
+)
+
+data class Admin(
+    val id: Uuid, val name: String, val email: String, val description: String
+)
+
+@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
 //    val siteHost = "localhost:8081"
@@ -226,10 +254,192 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
                             }
                         }), Route(
                         urlPath = Routes.Main.Admins.route, content = {
+                            val admins = listOf<Admin>(
+                                Admin(
+                                    id = Uuid.generateV4(),
+                                    name = "Softikk",
+                                    email = "softikk31@gmail.com",
+                                    description = "GAY"
+                                ), Admin(
+                                    id = Uuid.generateV4(),
+                                    name = "Softikk",
+                                    email = "softikk31@gmail.com",
+                                    description = "GAY"
+                                ), Admin(
+                                    id = Uuid.generateV4(),
+                                    name = "Softikk",
+                                    email = "softikk31@gmail.com",
+                                    description = "GAY"
+                                ), Admin(
+                                    id = Uuid.generateV4(),
+                                    name = "Softikk",
+                                    email = "softikk31@gmail.com",
+                                    description = "GAY"
+                                ), Admin(
+                                    id = Uuid.generateV4(),
+                                    name = "Softikk",
+                                    email = "softikk31@gmail.com",
+                                    description = "GAY"
+                                ), Admin(
+                                    id = Uuid.generateV4(),
+                                    name = "Softikk",
+                                    email = "softikk31@gmail.com",
+                                    description = "GAY"
+                                ), Admin(
+                                    id = Uuid.generateV4(),
+                                    name = "Softikk",
+                                    email = "softikk31@gmail.com",
+                                    description = "GAY"
+                                ), Admin(
+                                    id = Uuid.generateV4(),
+                                    name = "Softikk",
+                                    email = "softikk31@gmail.com",
+                                    description = "GAY"
+                                ), Admin(
+                                    id = Uuid.generateV4(),
+                                    name = "Softikk",
+                                    email = "softikk31@gmail.com",
+                                    description = "GAY"
+                                ), Admin(
+                                    id = Uuid.generateV4(),
+                                    name = "Softikk",
+                                    email = "softikk31@gmail.com",
+                                    description = "GAY"
+                                )
+                            )
 
+                            LazyVerticalGrid(
+                                modifier = Modifier.fillMaxSize(),
+                                columns = GridCells.Adaptive(150.dp),
+                                contentPadding = PaddingValues(top = DimensTheme.paddings.mediumPadding),
+                                verticalArrangement = Arrangement.spacedBy(DimensTheme.paddings.mediumPadding),
+                                horizontalArrangement = Arrangement.spacedBy(DimensTheme.paddings.mediumPadding),
+                                content = {
+                                    items(admins) { admin ->
+                                        key(admin.id) {
+                                            AdminWidget(
+                                                name = admin.name,
+                                                email = admin.email,
+                                                description = admin.description
+                                            )
+                                        }
+                                    }
+                                })
                         }), Route(
                         urlPath = Routes.Main.Sites.route, content = {
+                            val sites = listOf<Site>(
+                                Site(
+                                    id = Uuid.generateV4(),
+                                    name = "My site",
+                                    host = "https://site.ru",
+                                    description = "Это какой то сайт крч",
+                                    createAt = Clock.System.now()
+                                        .plus(DateTimePeriod(days = 2), TimeZone.UTC)
+                                        .toLocalDateTime(
+                                            TimeZone.currentSystemDefault()
+                                        )
+                                ), Site(
+                                    id = Uuid.generateV4(),
+                                    name = "My site",
+                                    host = "https://site.ru",
+                                    description = "Это какой то сайт крч",
+                                    createAt = Clock.System.now()
+                                        .plus(DateTimePeriod(days = 2), TimeZone.UTC)
+                                        .toLocalDateTime(
+                                            TimeZone.currentSystemDefault()
+                                        )
+                                ), Site(
+                                    id = Uuid.generateV4(),
+                                    name = "My site",
+                                    host = "https://site.ru",
+                                    description = "Это какой то сайт крч",
+                                    createAt = Clock.System.now()
+                                        .plus(DateTimePeriod(days = 2), TimeZone.UTC)
+                                        .toLocalDateTime(
+                                            TimeZone.currentSystemDefault()
+                                        )
+                                ), Site(
+                                    id = Uuid.generateV4(),
+                                    name = "My site",
+                                    host = "https://site.ru",
+                                    description = "Это какой то сайт крч",
+                                    createAt = Clock.System.now()
+                                        .plus(DateTimePeriod(days = 2), TimeZone.UTC)
+                                        .toLocalDateTime(
+                                            TimeZone.currentSystemDefault()
+                                        )
+                                ), Site(
+                                    id = Uuid.generateV4(),
+                                    name = "My site",
+                                    host = "https://site.ru",
+                                    description = "Это какой то сайт крч",
+                                    createAt = Clock.System.now()
+                                        .plus(DateTimePeriod(days = 2), TimeZone.UTC)
+                                        .toLocalDateTime(
+                                            TimeZone.currentSystemDefault()
+                                        )
+                                ), Site(
+                                    id = Uuid.generateV4(),
+                                    name = "My site",
+                                    host = "https://site.ru",
+                                    description = "Это какой то сайт крч",
+                                    createAt = Clock.System.now()
+                                        .plus(DateTimePeriod(days = 2), TimeZone.UTC)
+                                        .toLocalDateTime(
+                                            TimeZone.currentSystemDefault()
+                                        )
+                                ), Site(
+                                    id = Uuid.generateV4(),
+                                    name = "My site",
+                                    host = "https://site.ru",
+                                    description = "Это какой то сайт крч",
+                                    createAt = Clock.System.now()
+                                        .plus(DateTimePeriod(days = 2), TimeZone.UTC)
+                                        .toLocalDateTime(
+                                            TimeZone.currentSystemDefault()
+                                        )
+                                ), Site(
+                                    id = Uuid.generateV4(),
+                                    name = "My site",
+                                    host = "https://site.ru",
+                                    description = "Это какой то сайт крч",
+                                    createAt = Clock.System.now()
+                                        .plus(DateTimePeriod(days = 2), TimeZone.UTC)
+                                        .toLocalDateTime(
+                                            TimeZone.currentSystemDefault()
+                                        )
+                                ), Site(
+                                    id = Uuid.generateV4(),
+                                    name = "My site",
+                                    host = "https://site.ru",
+                                    description = "Это какой то сайт крч",
+                                    createAt = Clock.System.now()
+                                        .plus(DateTimePeriod(days = 2), TimeZone.UTC)
+                                        .toLocalDateTime(
+                                            TimeZone.currentSystemDefault()
+                                        )
+                                )
 
+
+                            )
+                            LazyVerticalGrid(
+                                modifier = Modifier.fillMaxSize(),
+                                columns = GridCells.Adaptive(150.dp),
+                                contentPadding = PaddingValues(top = DimensTheme.paddings.mediumPadding),
+                                verticalArrangement = Arrangement.spacedBy(DimensTheme.paddings.mediumPadding),
+                                horizontalArrangement = Arrangement.spacedBy(DimensTheme.paddings.mediumPadding),
+                                content = {
+                                    items(sites) { site ->
+                                        key(site.id) {
+                                            SiteWidget(
+                                                name = site.name,
+                                                host = site.host,
+                                                description = site.description,
+                                                createAt = site.createAt
+                                            )
+                                        }
+                                    }
+                                })
                         }), Route(
                         urlPath = Routes.Main.Admins.Id.route, content = {
 
