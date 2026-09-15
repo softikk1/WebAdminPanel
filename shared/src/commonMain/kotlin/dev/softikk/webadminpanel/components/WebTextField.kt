@@ -3,11 +3,14 @@ package dev.softikk.webadminpanel.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.BasicSecureTextField
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -73,75 +76,85 @@ fun WebTextField(
         val isPassword = keyboardType == KeyboardType.Password
         if (isPassword) {
             var showPassword by remember { mutableStateOf(true) }
-            BasicSecureTextField(
-                modifier = modifier.padding(
-                    horizontal = DimensTheme.paddings.mediumPadding
-                ),
-                state = state,
-                textObfuscationMode = if (showPassword) {
-                    TextObfuscationMode.Visible
-                } else {
-                    TextObfuscationMode.RevealLastTyped
-                },
-                textStyle = MaterialTheme.typography.bodyMedium,
-                keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-                decorator = TextFieldDefaults.decorator(
+            Row(
+                modifier = Modifier.wrapContentSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                BasicSecureTextField(
+                    modifier = modifier.padding(
+                        start = DimensTheme.paddings.mediumPadding
+                    ).weight(1f),
                     state = state,
-                    enabled = true,
-                    lineLimits = TextFieldLineLimits.SingleLine,
-                    outputTransformation = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    contentPadding = PaddingValues(vertical = WebTextFieldContentPadding),
-                    placeholder = {
-                        Text(
-                            text = labelText,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    textObfuscationMode = if (showPassword) {
+                        TextObfuscationMode.Visible
+                    } else {
+                        TextObfuscationMode.RevealLastTyped
                     },
-                    trailingIcon = {
-                        IconButton(
-                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand), onClick = {
-                                showPassword = !showPassword
-                            }) {
-                            Icon(
-                                modifier = Modifier.size(WebTextFieldTrailingIconSize),
-                                imageVector = vectorResource(
-                                    if (showPassword) Res.drawable.eye_off else Res.drawable.eye
-                                ),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                    decorator = TextFieldDefaults.decorator(
+                        state = state,
+                        enabled = true,
+                        lineLimits = TextFieldLineLimits.SingleLine,
+                        outputTransformation = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        contentPadding = PaddingValues(vertical = WebTextFieldContentPadding),
+                        placeholder = {
+                            Text(
+                                text = labelText,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        }
-                    },
-                    container = {})
-            )
+                        },
+                        container = {})
+                )
+                IconButton(
+                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand), onClick = {
+                        showPassword = !showPassword
+                    }) {
+                    Icon(
+                        modifier = Modifier.size(WebTextFieldTrailingIconSize),
+                        imageVector = vectorResource(
+                            if (showPassword) Res.drawable.eye_off else Res.drawable.eye
+                        ),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         } else {
-            BasicTextField(
-                modifier = modifier.padding(
-                    horizontal = DimensTheme.paddings.mediumPadding
-                ),
-                state = state,
-                textStyle = MaterialTheme.typography.bodyMedium,
-                keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-                decorator = TextFieldDefaults.decorator(
+            Row(
+                modifier = Modifier.wrapContentSize(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                leadingIcon?.invoke()
+                BasicTextField(
+                    modifier = modifier.weight(1f).padding(
+                        start = if (leadingIcon == null) DimensTheme.paddings.mediumPadding else 0.dp,
+                        end = if (trailingIcon == null) DimensTheme.paddings.mediumPadding else 0.dp
+                    ),
                     state = state,
-                    enabled = true,
-                    lineLimits = TextFieldLineLimits.SingleLine,
-                    outputTransformation = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    contentPadding = PaddingValues(vertical = WebTextFieldContentPadding),
-                    leadingIcon = leadingIcon,
-                    trailingIcon = trailingIcon,
-                    placeholder = {
-                        Text(
-                            text = labelText,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    },
-                    container = {})
-            )
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                    decorator = TextFieldDefaults.decorator(
+                        state = state,
+                        enabled = true,
+                        lineLimits = TextFieldLineLimits.SingleLine,
+                        outputTransformation = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        contentPadding = PaddingValues(vertical = WebTextFieldContentPadding),
+                        placeholder = {
+                            Text(
+                                text = labelText,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        container = {})
+                )
+                trailingIcon?.invoke()
+            }
         }
     }
 }

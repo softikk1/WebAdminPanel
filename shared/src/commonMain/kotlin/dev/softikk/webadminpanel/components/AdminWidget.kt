@@ -29,19 +29,19 @@ private val AdminWidgetShadowRadius = 6.dp
 @Composable
 fun AdminWidget(admin: Admin, navController: NavHostController) {
     Box(
-        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand).clickable {
-            navController.navigate(
-                Routes.Main.Admins.Id(
-                    adminId = admin.id
-                ).route
-            )
-        }.fillMaxWidth().dropShadow(
+        modifier = Modifier.fillMaxWidth().dropShadow(
             shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
                 radius = AdminWidgetShadowRadius,
                 offset = DpOffset(0.dp, 1.dp),
                 color = MaterialTheme.colorScheme.onSurface.copy(0.1f)
             )
-        ).clip(DimensTheme.shapes.mediumShape).border(
+        ).clip(DimensTheme.shapes.mediumShape).pointerHoverIcon(PointerIcon.Hand).clickable {
+            navController.navigate(
+                Routes.Main.Admins.Id(
+                    adminId = admin.id
+                ).route
+            )
+        }.border(
             width = 1.dp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             shape = DimensTheme.shapes.mediumShape

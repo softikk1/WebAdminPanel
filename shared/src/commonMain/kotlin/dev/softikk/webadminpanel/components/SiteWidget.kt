@@ -30,13 +30,7 @@ private val SiteWidgetShadowRadius = 6.dp
 @Composable
 fun SiteWidget(navController: NavHostController, site: Site) {
     Box(
-        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand).clickable {
-            navController.navigate(
-                Routes.Main.Sites.Id(
-                    siteId = site.id
-                ).route
-            )
-        }.fillMaxWidth().dropShadow(
+        modifier = Modifier.fillMaxWidth().dropShadow(
             shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
                 radius = SiteWidgetShadowRadius,
                 offset = DpOffset(0.dp, 1.dp),
@@ -46,7 +40,13 @@ fun SiteWidget(navController: NavHostController, site: Site) {
             width = 1.dp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             shape = DimensTheme.shapes.mediumShape
-        ).background(MaterialTheme.colorScheme.surface)
+        ).pointerHoverIcon(PointerIcon.Hand).clickable {
+            navController.navigate(
+                Routes.Main.Sites.Id(
+                    siteId = site.id
+                ).route
+            )
+        }.background(MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.padding(DimensTheme.paddings.mediumPadding),

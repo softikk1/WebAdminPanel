@@ -265,7 +265,12 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
         Website(
             header = {
                 currentRoute?.let {
-                    if (Routes.Main.route in currentRoute) {
+                    if ((Routes.Main.route in currentRoute) and (currentRoute.split('/').size == Routes.Main.Sites.route.split(
+                            '/'
+                        ).size) and (currentRoute.split('/').size == Routes.Main.Admins.route.split(
+                            '/'
+                        ).size)
+                    ) {
                         Box(
                             modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
                         ) {
