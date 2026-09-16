@@ -38,15 +38,17 @@ import org.jetbrains.compose.resources.vectorResource
 import webadminpanel.shared.generated.resources.Res
 import webadminpanel.shared.generated.resources.plus
 import webadminpanel.shared.generated.resources.search
-import webadminpanel.shared.generated.resources.settings
 import webadminpanel.shared.generated.resources.x
 
 private val WebToolboxShadowRadius = 6.dp
 private val WebToolboxIconSize = 24.dp
 private val WidthButtonWebToolbox = 120.dp
 private val WidthMaxToolbox = 400.dp
-private val WidthMinToolbox = 3000.dp
+private val WidthMinToolbox = 300.dp
 private val HeightWebToolbox = 40.dp
+private const val SearchTextFieldPlaceholder = "поиск"
+private const val ToolboxAdmins = "Админы"
+private const val ToolboxSites = "Сайты"
 
 @Composable
 fun WebToolbox(
@@ -71,31 +73,35 @@ fun WebToolbox(
         if (isSearch) {
             val searchTextFieldState = rememberTextFieldState()
 
-            WebTextField(state = searchTextFieldState, labelText = "search", leadingIcon = {
-                IconButton(onClick = {}) {
-                    Icon(
-                        imageVector = vectorResource(Res.drawable.search),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }, trailingIcon = {
-                IconButton(modifier = Modifier.pointerHoverIcon(PointerIcon.Hand), onClick = {
-                    if (searchTextFieldState.text.isNotEmpty()) {
-                        searchTextFieldState.edit {
-                            replace(0, searchTextFieldState.text.length, "")
-                        }
-                    } else {
-                        isSearch = false
+            WebTextField(
+                state = searchTextFieldState,
+                labelText = SearchTextFieldPlaceholder,
+                leadingIcon = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector = vectorResource(Res.drawable.search),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
-                }) {
-                    Icon(
-                        imageVector = vectorResource(Res.drawable.x),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            })
+                },
+                trailingIcon = {
+                    IconButton(modifier = Modifier.pointerHoverIcon(PointerIcon.Hand), onClick = {
+                        if (searchTextFieldState.text.isNotEmpty()) {
+                            searchTextFieldState.edit {
+                                replace(0, searchTextFieldState.text.length, "")
+                            }
+                        } else {
+                            isSearch = false
+                        }
+                    }) {
+                        Icon(
+                            imageVector = vectorResource(Res.drawable.x),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                })
         } else {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -128,19 +134,19 @@ fun WebToolbox(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                IconButton(
-                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand), onClick = {
-
-                    }) {
-                    Icon(
-                        modifier = Modifier.size(WebToolboxIconSize),
-                        imageVector = vectorResource(
-                            Res.drawable.settings
-                        ),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+//                IconButton(
+//                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand), onClick = {
+//
+//                    }) {
+//                    Icon(
+//                        modifier = Modifier.size(WebToolboxIconSize),
+//                        imageVector = vectorResource(
+//                            Res.drawable.settings
+//                        ),
+//                        contentDescription = null,
+//                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+//                    )
+//                }
                 Row(
                     modifier = Modifier.padding(DimensTheme.paddings.xs2Padding),
                     verticalAlignment = Alignment.CenterVertically,
@@ -154,7 +160,7 @@ fun WebToolbox(
                         }) {
                         Text(
                             modifier = Modifier.padding(vertical = DimensTheme.paddings.smallPadding),
-                            text = "Сайты",
+                            text = ToolboxSites,
                             style = MaterialTheme.typography.bodyMedium,
                             color = if (currentRoute == Routes.Main.Sites.route) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface
                         )
@@ -168,7 +174,7 @@ fun WebToolbox(
                         }) {
                         Text(
                             modifier = Modifier.padding(vertical = DimensTheme.paddings.smallPadding),
-                            text = "Админы",
+                            text = ToolboxAdmins,
                             style = MaterialTheme.typography.bodyMedium,
                             color = if (currentRoute == Routes.Main.Admins.route) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface
                         )
