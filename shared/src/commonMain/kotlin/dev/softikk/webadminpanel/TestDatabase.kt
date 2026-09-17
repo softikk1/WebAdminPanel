@@ -10,9 +10,28 @@ object TestDatabase {
     private var _admins = MutableStateFlow<List<Admin>>(emptyList())
     val admins = _admins.asStateFlow()
 
-    suspend fun newSite(site: Site) {
+    suspend fun saveSite(site: Site) {
+        if (site.id in _sites.value.map { it.id }) {
+            replaceSite(site)
+        } else {
+            newSite(site)
+        }
+    }
+
+    private suspend fun newSite(site: Site) {
         _sites.emit(
             _sites.value + site
         )
+    }
+
+    private suspend fun replaceSite(site: Site) {
+        _sites.emit(
+            _sites.value.map {
+                if (it.id == site.id) {
+                    site
+                } else {
+                    it
+                }
+            })
     }
 }

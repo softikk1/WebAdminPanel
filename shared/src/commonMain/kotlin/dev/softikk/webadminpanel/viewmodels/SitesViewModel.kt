@@ -7,9 +7,9 @@ import dev.softikk.webadminpanel.TestDatabase
 import kotlinx.coroutines.launch
 
 class SitesViewModel(private val database: TestDatabase) : ViewModel() {
-    fun newSite(site: Site) {
+    fun saveSite(site: Site) {
         viewModelScope.launch {
-            database.newSite(site)
+            database.saveSite(site)
         }
     }
 }

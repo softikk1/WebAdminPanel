@@ -22,7 +22,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +38,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.savedstate.read
+import dev.softikk.webadminpanel.DefaultDescriptionNameSiteDetails
+import dev.softikk.webadminpanel.DefaultHostNameSiteDetails
+import dev.softikk.webadminpanel.DefaultSiteNameSiteDetails
 import dev.softikk.webadminpanel.Site
 import dev.softikk.webadminpanel.TestDatabase
 import dev.softikk.webadminpanel.TextButtonSiteDetails
@@ -51,6 +56,7 @@ import dev.softikk.webadminpanel.viewmodels.SitesViewModel
 import dev.softikk.webkit.theme.DimensTheme
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.vectorResource
 import webadminpanel.shared.generated.resources.Res
@@ -73,26 +79,22 @@ fun SiteDetails(
         if (id == "null") null else id
     }
 
-    val siteName = rememberTextFieldState(initialText = "New site")
-    val hostName = rememberTextFieldState(initialText = "https://site.com")
-    val descriptionSite = rememberTextFieldState(initialText = "New site description")
+    val siteName = rememberTextFieldState(initialText = DefaultSiteNameSiteDetails)
+    val hostName = rememberTextFieldState(initialText = DefaultHostNameSiteDetails)
+    val descriptionSite = rememberTextFieldState(initialText = DefaultDescriptionNameSiteDetails)
 
     val sites by TestDatabase.sites.collectAsState()
 
     val elements = remember { mutableStateListOf<UIElementModel>() }
 
-    val site = remember(siteName.text, hostName.text, descriptionSite.text, elements) {
-        siteId?.let { sites.singleOrNull { site -> site.id == Uuid.parse(siteId) } }.also { site ->
-            site?.let {
-                siteName.edit { replace(0, siteName.text.length, site.name) }
-                hostName.edit { replace(0, hostName.text.length, site.host) }
-                descriptionSite.edit {
-                    replace(
-                        0, descriptionSite.text.length, site.description
-                    )
-                }
-            }
-        } ?: Site(
+    val findSuchSite by remember {
+        mutableStateOf(siteId?.let {
+            sites.singleOrNull { site -> site.id == Uuid.parse(siteId) }
+        })
+    }
+
+    var site by remember(siteName.text, hostName.text, descriptionSite.text, elements) {
+        var initSite = Site(
             id = Uuid.generateV4(),
             name = siteName.text.toString(),
             host = hostName.text.toString(),
@@ -100,9 +102,35 @@ fun SiteDetails(
             createAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             elements = elements
         )
+
+        findSuchSite?.let {
+            initSite = initSite.copy(id = it.id, createAt = it.createAt)
+        }
+
+        mutableStateOf(
+            initSite
+        )
     }
 
     LaunchedEffect(Unit) {
+        findSuchSite?.let {
+            site = site.copy(
+                id = it.id,
+                name = it.name,
+                host = it.host,
+                description = it.description,
+                createAt = it.createAt,
+                elements = it.elements
+            )
+        }
+
+        siteName.edit { replace(0, siteName.text.length, site.name) }
+        hostName.edit { replace(0, hostName.text.length, site.host) }
+        descriptionSite.edit {
+            replace(
+                0, descriptionSite.text.length, site.description
+            )
+        }
         site.elements.forEach { element ->
             elements.add(element)
         }
@@ -133,8 +161,10 @@ fun SiteDetails(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                val date = site.createAt.date
-                val time = site.createAt.time
+                val createAt = site.createAt.toInstant(TimeZone.UTC)
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                val date = createAt.date
+                val time = createAt.time
                 Text(
                     text = "${time.hour.formatDateTimePlusZero()}:${time.minute.formatDateTimePlusZero()} ${date.day.formatDateTimePlusZero()}.${date.month.number.formatDateTimePlusZero()}.${date.year.formatDateTimePlusZero()}",
                     style = MaterialTheme.typography.bodySmall,
@@ -212,7 +242,7 @@ fun SiteDetails(
         ) {
             WebButton(
                 modifier = Modifier.height(50.dp).weight(1f), onClick = {
-                    sitesViewModel.newSite(site)
+                    sitesViewModel.saveSite(site)
                     navController.popBackStack()
                 }) {
                 Text(
