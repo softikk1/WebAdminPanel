@@ -123,7 +123,17 @@ fun WebToolbox(
                 }
                 IconButton(
                     modifier = Modifier.pointerHoverIcon(PointerIcon.Hand), onClick = {
+                        currentRoute?.let {
+                            when (currentRoute) {
+                                Routes.Main.Admins.route -> {
+                                    navController.navigate(Routes.Main.Admins.Details(null).route)
+                                }
 
+                                Routes.Main.Sites.route -> {
+                                    navController.navigate(Routes.Main.Sites.Details(null).route)
+                                }
+                            }
+                        }
                     }) {
                     Icon(
                         modifier = Modifier.size(WebToolboxIconSize),

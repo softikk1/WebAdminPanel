@@ -42,7 +42,7 @@ fun SiteWidget(navController: NavHostController, site: Site) {
             shape = DimensTheme.shapes.mediumShape
         ).pointerHoverIcon(PointerIcon.Hand).clickable {
             navController.navigate(
-                Routes.Main.Sites.Id(
+                Routes.Main.Sites.Details(
                     siteId = site.id
                 ).route
             )

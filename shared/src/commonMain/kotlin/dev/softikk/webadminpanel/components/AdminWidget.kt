@@ -37,7 +37,7 @@ fun AdminWidget(admin: Admin, navController: NavHostController) {
             )
         ).clip(DimensTheme.shapes.mediumShape).pointerHoverIcon(PointerIcon.Hand).clickable {
             navController.navigate(
-                Routes.Main.Admins.Id(
+                Routes.Main.Admins.Details(
                     adminId = admin.id
                 ).route
             )
