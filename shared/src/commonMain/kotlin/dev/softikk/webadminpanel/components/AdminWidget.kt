@@ -62,7 +62,7 @@ fun AdminWidget(admin: Admin, navController: NavHostController) {
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = admin.description,
+                text = admin.password,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

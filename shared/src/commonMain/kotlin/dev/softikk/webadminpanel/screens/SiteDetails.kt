@@ -51,7 +51,7 @@ import dev.softikk.webadminpanel.components.WebButton
 import dev.softikk.webadminpanel.components.WebTextField
 import dev.softikk.webadminpanel.components.WebTextFieldKeyValue
 import dev.softikk.webadminpanel.components.formatDateTimePlusZero
-import dev.softikk.webadminpanel.models.UIElementModel
+import dev.softikk.webadminpanel.models.UISiteElementModel
 import dev.softikk.webadminpanel.viewmodels.SitesViewModel
 import dev.softikk.webkit.theme.DimensTheme
 import kotlinx.datetime.TimeZone
@@ -66,7 +66,7 @@ import kotlin.time.Clock
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-private val MaxWidthTextFieldSitesDetails = 400.dp
+private val MaxWidthTextFieldSiteDetails = 400.dp
 
 @OptIn(ExperimentalUuidApi::class)
 @Composable
@@ -85,7 +85,7 @@ fun SiteDetails(
 
     val sites by TestDatabase.sites.collectAsState()
 
-    val elements = remember { mutableStateListOf<UIElementModel>() }
+    val elements = remember { mutableStateListOf<UISiteElementModel>() }
 
     val findSuchSite by remember {
         mutableStateOf(siteId?.let {
@@ -93,7 +93,7 @@ fun SiteDetails(
         })
     }
 
-    var site by remember(siteName.text, hostName.text, descriptionSite.text, elements) {
+    var site by remember(siteName.text, hostName.text, descriptionSite.text, elements.toList()) {
         var initSite = Site(
             id = Uuid.generateV4(),
             name = siteName.text.toString(),
@@ -184,7 +184,7 @@ fun SiteDetails(
             }
         }
         LazyColumn(
-            modifier = Modifier.widthIn(max = MaxWidthTextFieldSitesDetails),
+            modifier = Modifier.widthIn(max = MaxWidthTextFieldSiteDetails),
             verticalArrangement = Arrangement.spacedBy(DimensTheme.paddings.largePadding)
         ) {
             item {
@@ -219,7 +219,7 @@ fun SiteDetails(
                         initialText = value
                     )
                     LaunchedEffect(keyTextFieldState.text, valueTextFieldState.text) {
-                        elements[elements.indexOf(element)] = UIElementModel(
+                        elements[elements.indexOf(element)] = UISiteElementModel(
                             id = element.id,
                             key = keyTextFieldState.text.toString(),
                             value = valueTextFieldState.text.toString()
@@ -235,7 +235,7 @@ fun SiteDetails(
             }
         }
         Row(
-            modifier = Modifier.widthIn(max = MaxWidthTextFieldSitesDetails)
+            modifier = Modifier.widthIn(max = MaxWidthTextFieldSiteDetails)
                 .padding(bottom = DimensTheme.paddings.mediumPadding),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
@@ -266,7 +266,7 @@ fun SiteDetails(
                     ), shape = DimensTheme.shapes.mediumShape
                 ), containerColor = MaterialTheme.colorScheme.surface, onClick = {
                     elements.add(
-                        UIElementModel(
+                        UISiteElementModel(
                             id = Uuid.generateV4(), key = "", value = ""
                         )
                     )

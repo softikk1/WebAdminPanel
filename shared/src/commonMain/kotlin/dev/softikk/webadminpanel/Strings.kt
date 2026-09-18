@@ -18,3 +18,8 @@ const val TextFieldSiteNameSiteDetails = "Название сайта"
 const val TextFieldHostNameSiteDetails = "Хост"
 const val TextFieldSiteDescriptionSiteDetails = "Описание сайта"
 const val TextButtonSiteDetails = "Сохранить"
+
+// AdminsDetails
+const val DefaultAdminNameSiteDetails = "Имя пользователя"
+const val DefaultEmailSiteDetails = "Email"
+const val DefaultPasswordNameSiteDetails = "Пароль"

@@ -34,4 +34,29 @@ object TestDatabase {
                 }
             })
     }
+
+    suspend fun saveAdmin(admin: Admin) {
+        if (admin.id in _admins.value.map { it.id }) {
+            replaceAdmin(admin)
+        } else {
+            newAdmin(admin)
+        }
+    }
+
+    private suspend fun newAdmin(admin: Admin) {
+        _admins.emit(
+            _admins.value + admin
+        )
+    }
+
+    private suspend fun replaceAdmin(admin: Admin) {
+        _admins.emit(
+            _admins.value.map {
+                if (it.id == admin.id) {
+                    admin
+                } else {
+                    it
+                }
+            })
+    }
 }

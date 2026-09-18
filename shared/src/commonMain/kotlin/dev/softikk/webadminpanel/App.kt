@@ -18,7 +18,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dev.softikk.webadminpanel.components.WebToolbox
-import dev.softikk.webadminpanel.models.UIElementModel
+import dev.softikk.webadminpanel.models.UISiteElementModel
 import dev.softikk.webadminpanel.screens.AdminDetails
 import dev.softikk.webadminpanel.screens.Admins
 import dev.softikk.webadminpanel.screens.Auth
@@ -47,12 +47,12 @@ data class Site(
     val host: String,
     val description: String,
     val createAt: LocalDateTime,
-    val elements: List<UIElementModel> = emptyList()
+    val elements: List<UISiteElementModel> = emptyList()
 )
 
 @Serializable
 data class Admin(
-    val id: Uuid, val name: String, val email: String, val description: String
+    val id: Uuid, val name: String, val email: String, val password: String
 )
 
 @OptIn(ExperimentalUuidApi::class)

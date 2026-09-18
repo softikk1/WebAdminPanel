@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 class SitesViewModel(private val database: TestDatabase) : ViewModel() {
     fun saveSite(site: Site) {
         viewModelScope.launch {
-            database.saveSite(site)
+            database.saveSite(site.copy(elements = site.elements.filter { it.key.isNotBlank() }))
         }
     }
 }

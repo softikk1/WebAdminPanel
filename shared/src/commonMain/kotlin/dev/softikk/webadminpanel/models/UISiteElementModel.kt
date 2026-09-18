@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlin.uuid.Uuid
 
 @Serializable
-data class UIElementModel(
+data class UISiteElementModel(
     val id: Uuid,
     val key: String,
     val value: String
