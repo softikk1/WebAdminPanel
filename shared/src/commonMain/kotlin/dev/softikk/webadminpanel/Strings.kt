@@ -20,6 +20,8 @@ const val TextFieldSiteDescriptionSiteDetails = "Описание сайта"
 const val TextButtonSiteDetails = "Сохранить"
 
 // AdminsDetails
-const val DefaultAdminNameSiteDetails = "Имя пользователя"
-const val DefaultEmailSiteDetails = "Email"
-const val DefaultPasswordNameSiteDetails = "Пароль"
+const val DefaultAdminNameAdminDetails = "Admin"
+const val DefaultAdminEmailAdminDetails = "email@gmail.com"
+const val TextFieldAdminNameAdminDetails = "Имя пользователя"
+const val TextFieldEmailAdminDetails = "Email"
+const val TextFieldPasswordAdminDetails = "Password"

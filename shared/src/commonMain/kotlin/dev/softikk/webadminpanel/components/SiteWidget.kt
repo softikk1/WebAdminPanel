@@ -21,14 +21,19 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import dev.softikk.webadminpanel.Routes
-import dev.softikk.webadminpanel.Site
+import dev.softikk.webadminpanel.models.SiteModel
 import dev.softikk.webkit.theme.DimensTheme
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 
 private val SiteWidgetShadowRadius = 6.dp
 
 @Composable
-fun SiteWidget(navController: NavHostController, site: Site) {
+fun SiteWidget(
+    navController: NavHostController, site: SiteModel
+) {
     Box(
         modifier = Modifier.fillMaxWidth().dropShadow(
             shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
@@ -41,11 +46,25 @@ fun SiteWidget(navController: NavHostController, site: Site) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             shape = DimensTheme.shapes.mediumShape
         ).pointerHoverIcon(PointerIcon.Hand).clickable {
+
             navController.navigate(
                 Routes.Main.Sites.Details(
                     siteId = site.id
                 ).route
             )
+//                    adminsViewModel.setStateAdmin(
+//                        stateAdmin.copy(
+//                            sites = stateAdmin.sites - site
+//                        )
+//                    )
+//                } else {
+//                    adminsViewModel.setStateAdmin(
+//                        stateAdmin.copy(
+//                            sites = stateAdmin.sites + site
+//                        )
+//                    )
+
+
         }.background(MaterialTheme.colorScheme.surface)
     ) {
         Column(
@@ -67,8 +86,10 @@ fun SiteWidget(navController: NavHostController, site: Site) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            val date = site.createAt.date
-            val time = site.createAt.time
+            val createAt = site.createAt.toInstant(TimeZone.UTC)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+            val date = createAt.date
+            val time = createAt.time
             Text(
                 text = "${time.hour.formatDateTimePlusZero()}:${time.minute.formatDateTimePlusZero()} ${date.day.formatDateTimePlusZero()}.${date.month.number.formatDateTimePlusZero()}.${date.year.formatDateTimePlusZero()}",
                 style = MaterialTheme.typography.bodySmall,
@@ -77,5 +98,60 @@ fun SiteWidget(navController: NavHostController, site: Site) {
         }
     }
 }
+
+@Composable
+fun SiteSelectWidget(
+    site: SiteModel, isSelect: Boolean, onClick: (SiteModel) -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxWidth().dropShadow(
+            shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
+                radius = SiteWidgetShadowRadius,
+                offset = DpOffset(0.dp, 1.dp),
+                color = if (isSelect) MaterialTheme.colorScheme.primary.copy(0.1f)
+                else MaterialTheme.colorScheme.onSurface.copy(
+                    0.1f
+                )
+            )
+        ).clip(DimensTheme.shapes.mediumShape).border(
+            width = 1.dp,
+            color = if (isSelect) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            shape = DimensTheme.shapes.mediumShape
+        ).pointerHoverIcon(PointerIcon.Hand).clickable {
+            onClick(site)
+        }.background(MaterialTheme.colorScheme.surface)
+    ) {
+        Column(
+            modifier = Modifier.padding(DimensTheme.paddings.mediumPadding),
+            verticalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
+        ) {
+            Text(
+                text = site.name,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = site.host,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = site.description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            val createAt = site.createAt.toInstant(TimeZone.UTC)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+            val date = createAt.date
+            val time = createAt.time
+            Text(
+                text = "${time.hour.formatDateTimePlusZero()}:${time.minute.formatDateTimePlusZero()} ${date.day.formatDateTimePlusZero()}.${date.month.number.formatDateTimePlusZero()}.${date.year.formatDateTimePlusZero()}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
 
 fun Int.formatDateTimePlusZero(): String = if (this < 10) "0$this" else this.toString()

@@ -34,14 +34,12 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.savedstate.read
 import dev.softikk.webadminpanel.DefaultDescriptionNameSiteDetails
 import dev.softikk.webadminpanel.DefaultHostNameSiteDetails
 import dev.softikk.webadminpanel.DefaultSiteNameSiteDetails
-import dev.softikk.webadminpanel.Site
 import dev.softikk.webadminpanel.TestDatabase
 import dev.softikk.webadminpanel.TextButtonSiteDetails
 import dev.softikk.webadminpanel.TextFieldHostNameSiteDetails
@@ -51,6 +49,7 @@ import dev.softikk.webadminpanel.components.WebButton
 import dev.softikk.webadminpanel.components.WebTextField
 import dev.softikk.webadminpanel.components.WebTextFieldKeyValue
 import dev.softikk.webadminpanel.components.formatDateTimePlusZero
+import dev.softikk.webadminpanel.models.SiteModel
 import dev.softikk.webadminpanel.models.UISiteElementModel
 import dev.softikk.webadminpanel.viewmodels.SitesViewModel
 import dev.softikk.webkit.theme.DimensTheme
@@ -71,10 +70,10 @@ private val MaxWidthTextFieldSiteDetails = 400.dp
 @OptIn(ExperimentalUuidApi::class)
 @Composable
 fun SiteDetails(
-    navController: NavHostController, navBackStackEntry: NavBackStackEntry?
+    sitesViewModel: SitesViewModel,
+    navController: NavHostController,
+    navBackStackEntry: NavBackStackEntry?
 ) {
-    val sitesViewModel = viewModel { SitesViewModel(TestDatabase) }
-
     val siteId = navBackStackEntry?.arguments?.read { getStringOrNull("siteId") }?.let { id ->
         if (id == "null") null else id
     }
@@ -94,7 +93,7 @@ fun SiteDetails(
     }
 
     var site by remember(siteName.text, hostName.text, descriptionSite.text, elements.toList()) {
-        var initSite = Site(
+        var initSite = SiteModel(
             id = Uuid.generateV4(),
             name = siteName.text.toString(),
             host = hostName.text.toString(),

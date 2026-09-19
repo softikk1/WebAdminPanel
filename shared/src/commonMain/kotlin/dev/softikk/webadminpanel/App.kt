@@ -14,16 +14,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dev.softikk.webadminpanel.components.WebToolbox
-import dev.softikk.webadminpanel.models.UISiteElementModel
 import dev.softikk.webadminpanel.screens.AdminDetails
 import dev.softikk.webadminpanel.screens.Admins
 import dev.softikk.webadminpanel.screens.Auth
 import dev.softikk.webadminpanel.screens.SiteDetails
 import dev.softikk.webadminpanel.screens.Sites
+import dev.softikk.webadminpanel.viewmodels.AdminsViewModel
+import dev.softikk.webadminpanel.viewmodels.SitesViewModel
 import dev.softikk.webkit.Website
 import dev.softikk.webkit.navigation.Route
 import dev.softikk.webkit.navigation.WebNavigation
@@ -31,29 +33,12 @@ import dev.softikk.webkit.theme.Dimens
 import dev.softikk.webkit.theme.DimensTheme
 import dev.softikk.webkit.theme.Shapes
 import dev.softikk.webkit.theme.WebTheme
-import kotlinx.datetime.LocalDateTime
-import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.Font
 import webadminpanel.shared.generated.resources.Res
 import webadminpanel.shared.generated.resources.inter
 import webadminpanel.shared.generated.resources.inter_italic
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
-@Serializable
-data class Site(
-    val id: Uuid,
-    val name: String,
-    val host: String,
-    val description: String,
-    val createAt: LocalDateTime,
-    val elements: List<UISiteElementModel> = emptyList()
-)
-
-@Serializable
-data class Admin(
-    val id: Uuid, val name: String, val email: String, val password: String
-)
 
 @OptIn(ExperimentalUuidApi::class)
 @Composable
@@ -94,6 +79,9 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
         Font(Res.font.inter, style = FontStyle.Italic),
         Font(Res.font.inter_italic, style = FontStyle.Italic)
     )
+
+    val sitesViewModel = viewModel { SitesViewModel(TestDatabase) }
+    val adminsViewModel = viewModel { AdminsViewModel(TestDatabase) }
 
     Box(modifier = Modifier.padding(horizontal = DimensTheme.paddings.mediumPadding)) {
         Website(
@@ -144,16 +132,22 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
                             Admins(navController)
                         }), Route(
                         urlPath = Routes.Main.Sites.route, content = {
-                            Sites(navController)
+                            Sites(
+                                navController = navController
+                            )
                         }), Route(
                         urlPath = Routes.Main.Admins.Details.pattern, content = {
                             AdminDetails(
-                                navController = navController, navBackStackEntry = navBackStackEntry
+                                adminsViewModel = adminsViewModel,
+                                navController = navController,
+                                navBackStackEntry = navBackStackEntry
                             )
                         }), Route(
                         urlPath = Routes.Main.Sites.Details.pattern, content = {
                             SiteDetails(
-                                navController = navController, navBackStackEntry = navBackStackEntry
+                                sitesViewModel = sitesViewModel,
+                                navController = navController,
+                                navBackStackEntry = navBackStackEntry
                             )
                         })
                 )

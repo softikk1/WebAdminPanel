@@ -20,14 +20,14 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import dev.softikk.webadminpanel.Admin
 import dev.softikk.webadminpanel.Routes
+import dev.softikk.webadminpanel.models.AdminModel
 import dev.softikk.webkit.theme.DimensTheme
 
 private val AdminWidgetShadowRadius = 6.dp
 
 @Composable
-fun AdminWidget(admin: Admin, navController: NavHostController) {
+fun AdminWidget(admin: AdminModel, navController: NavHostController) {
     Box(
         modifier = Modifier.fillMaxWidth().dropShadow(
             shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
@@ -60,11 +60,6 @@ fun AdminWidget(admin: Admin, navController: NavHostController) {
                 text = admin.email,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = admin.password,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
