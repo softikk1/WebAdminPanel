@@ -2,8 +2,6 @@ package dev.softikk.webadminpanel.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.softikk.webadminpanel.DefaultAdminEmailAdminDetails
-import dev.softikk.webadminpanel.DefaultAdminNameAdminDetails
 import dev.softikk.webadminpanel.TestDatabase
 import dev.softikk.webadminpanel.models.AdminModel
 import dev.softikk.webadminpanel.models.AdminScreenModel
@@ -27,24 +25,23 @@ class AdminsViewModel(private val database: TestDatabase) : ViewModel() {
     }
 
     fun initStateAdmin(adminId: String?) {
+        val admins = database.admins.value
+        val adminId = adminId?.let { Uuid.parse(it) }
         _stateAdmin.update {
-            val admins = database.admins.value
-            val adminId = adminId?.let { id -> Uuid.parse(id) }
             if ((adminId != null) and (adminId in admins.map { admin -> admin.id })) {
-                val adminReceive = admins.single { admin -> adminId == admin.id }
-                it.copy(
-                    name = adminReceive.name,
-                    email = adminReceive.email,
-                    password = adminReceive.password,
-                    sites = adminReceive.sites
-                )
+                val adminReceive = admins.singleOrNull { admin -> adminId == admin.id }
+                if (adminReceive != null) {
+                    it.copy(
+                        name = adminReceive.name,
+                        email = adminReceive.email,
+                        password = adminReceive.password,
+                        sites = adminReceive.sites
+                    )
+                } else {
+                    it
+                }
             } else {
-                it.copy(
-                    name = DefaultAdminNameAdminDetails,
-                    email = DefaultAdminEmailAdminDetails,
-                    password = "",
-                    sites = emptyList()
-                )
+                it
             }
         }
     }
