@@ -2,7 +2,7 @@ package dev.softikk.webadminpanel.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.softikk.webadminpanel.TestDatabase
+import dev.softikk.webadminpanel.api.AdminsApi
 import dev.softikk.webadminpanel.models.AdminModel
 import dev.softikk.webadminpanel.models.AdminScreenModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,37 +12,40 @@ import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-class AdminsViewModel(private val database: TestDatabase) : ViewModel() {
+class AdminsViewModel(private val adminsApi: AdminsApi) : ViewModel() {
     private val _stateAdmin = MutableStateFlow(AdminScreenModel())
     val stateAdmin = _stateAdmin.asStateFlow()
 
-    init {
+    private val _admins = MutableStateFlow<List<AdminModel>>(emptyList())
+    val admins = _admins.asStateFlow()
+
+    fun initStateAdmin(adminId: String?) {
         viewModelScope.launch {
-            _stateAdmin.collect {
-                println(it.name)
+            val admins = adminsApi.getAdmins()
+            val adminId = adminId?.let { Uuid.parse(it) }
+            _stateAdmin.update {
+                if ((adminId != null) and (adminId in admins.map { admin -> admin.id })) {
+                    val adminReceive = admins.singleOrNull { admin -> adminId == admin.id }
+                    if (adminReceive != null) {
+                        it.copy(
+                            name = adminReceive.name,
+                            email = adminReceive.email,
+                            password = adminReceive.password,
+                            sites = adminReceive.sites
+                        )
+                    } else {
+                        it
+                    }
+                } else {
+                    it
+                }
             }
         }
     }
 
-    fun initStateAdmin(adminId: String?) {
-        val admins = database.admins.value
-        val adminId = adminId?.let { Uuid.parse(it) }
-        _stateAdmin.update {
-            if ((adminId != null) and (adminId in admins.map { admin -> admin.id })) {
-                val adminReceive = admins.singleOrNull { admin -> adminId == admin.id }
-                if (adminReceive != null) {
-                    it.copy(
-                        name = adminReceive.name,
-                        email = adminReceive.email,
-                        password = adminReceive.password,
-                        sites = adminReceive.sites
-                    )
-                } else {
-                    it
-                }
-            } else {
-                it
-            }
+    fun getAdmins() {
+        viewModelScope.launch {
+            _admins.value = adminsApi.getAdmins()
         }
     }
 
@@ -65,12 +68,23 @@ class AdminsViewModel(private val database: TestDatabase) : ViewModel() {
     fun saveAdmin(adminId: String?) {
         viewModelScope.launch {
             val stateAdminReceive = _stateAdmin.value
-            database.saveAdmin(admin = AdminModel(id = adminId?.let { Uuid.parse(it) }
-                ?: Uuid.generateV4(),
-                name = stateAdminReceive.name,
-                email = stateAdminReceive.email,
-                password = stateAdminReceive.password,
-                sites = stateAdminReceive.sites))
+            val adminId = adminId?.let { Uuid.parse(it) }
+            if (adminId == null) {
+                adminsApi.createAdmin(
+                    name = stateAdminReceive.name,
+                    email = stateAdminReceive.email,
+                    password = stateAdminReceive.password,
+                    sites = stateAdminReceive.sites
+                )
+            } else {
+                adminsApi.updateAdmin(
+                    adminId = adminId,
+                    name = stateAdminReceive.name,
+                    email = stateAdminReceive.email,
+                    password = stateAdminReceive.password,
+                    sites = stateAdminReceive.sites
+                )
+            }
         }
     }
 }

@@ -7,21 +7,27 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import dev.softikk.webadminpanel.TestDatabase
 import dev.softikk.webadminpanel.components.AdminWidget
+import dev.softikk.webadminpanel.viewmodels.AdminsViewModel
 import dev.softikk.webkit.theme.DimensTheme
 
 private val MinSizeColumnsSitesAndAdmins = 150.dp
 
 @Composable
-fun Admins(navController: NavHostController) {
-    val admins by TestDatabase.admins.collectAsState()
+fun Admins(navController: NavHostController, adminsViewModel: AdminsViewModel) {
+    val admins by adminsViewModel.admins.collectAsState()
+
+    LaunchedEffect(Unit) {
+        adminsViewModel.getAdmins()
+    }
+
     LazyVerticalGrid(
         modifier = Modifier.fillMaxSize(),
         columns = GridCells.Adaptive(MinSizeColumnsSitesAndAdmins),

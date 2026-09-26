@@ -50,6 +50,7 @@ import dev.softikk.webadminpanel.TextFieldPasswordAdminDetails
 import dev.softikk.webadminpanel.components.WebButton
 import dev.softikk.webadminpanel.components.WebTextField
 import dev.softikk.webadminpanel.viewmodels.AdminsViewModel
+import dev.softikk.webadminpanel.viewmodels.SitesViewModel
 import dev.softikk.webkit.theme.DimensTheme
 import org.jetbrains.compose.resources.vectorResource
 import webadminpanel.shared.generated.resources.Res
@@ -67,6 +68,7 @@ private val IconDeleteSiteSize = 24.dp
 @Composable
 fun AdminDetails(
     adminsViewModel: AdminsViewModel,
+    sitesViewModel: SitesViewModel,
     navController: NavHostController,
     navBackStackEntry: NavBackStackEntry?
 ) {
@@ -112,7 +114,7 @@ fun AdminDetails(
 
     if (isSelectedSites) {
         SelectSites(
-            adminsViewModel = adminsViewModel, onClose = {
+            adminsViewModel = adminsViewModel, sitesViewModel = sitesViewModel, onClose = {
                 isSelectedSites = false
             })
     } else {

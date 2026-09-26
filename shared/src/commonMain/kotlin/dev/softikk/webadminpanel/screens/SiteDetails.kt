@@ -46,13 +46,10 @@ import dev.softikk.webadminpanel.components.WebButton
 import dev.softikk.webadminpanel.components.WebTextField
 import dev.softikk.webadminpanel.components.WebTextFieldKeyValue
 import dev.softikk.webadminpanel.components.formatDateTimePlusZero
-import dev.softikk.webadminpanel.models.UISiteElementModel
+import dev.softikk.webadminpanel.models.ElementModel
 import dev.softikk.webadminpanel.viewmodels.SitesViewModel
 import dev.softikk.webkit.theme.DimensTheme
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.vectorResource
 import webadminpanel.shared.generated.resources.Res
 import webadminpanel.shared.generated.resources.plus
@@ -130,19 +127,15 @@ fun SiteDetails(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 siteId?.let {
-                    val createAt =
-                        sitesViewModel.getSite(siteId = Uuid.parse(siteId))?.createAt?.toInstant(
-                            TimeZone.UTC
-                        )?.toLocalDateTime(TimeZone.currentSystemDefault())
-                    createAt?.let {
-                        val date = createAt.date
-                        val time = createAt.time
-                        Text(
-                            text = "${time.hour.formatDateTimePlusZero()}:${time.minute.formatDateTimePlusZero()} ${date.day.formatDateTimePlusZero()}.${date.month.number.formatDateTimePlusZero()}.${date.year.formatDateTimePlusZero()}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
+                    Text(
+                        text = "${stateSite.createAt.time.hour.formatDateTimePlusZero()}:" +
+                                "${stateSite.createAt.time.minute.formatDateTimePlusZero()} " +
+                                "${stateSite.createAt.date.day.formatDateTimePlusZero()}." +
+                                "${stateSite.createAt.date.month.number.formatDateTimePlusZero()}." +
+                                stateSite.createAt.date.year.formatDateTimePlusZero(),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 }
             }
 
@@ -194,7 +187,7 @@ fun SiteDetails(
                     )
                     LaunchedEffect(keyTextFieldState.text, valueTextFieldState.text) {
                         val elements = stateSite.elements.toMutableList()
-                        elements[elements.indexOf(element)] = UISiteElementModel(
+                        elements[elements.indexOf(element)] = ElementModel(
                             id = element.id,
                             key = keyTextFieldState.text.toString(),
                             value = valueTextFieldState.text.toString()
@@ -248,7 +241,7 @@ fun SiteDetails(
                 ), containerColor = MaterialTheme.colorScheme.surface, onClick = {
                     sitesViewModel.setStateSite(
                         stateSite.copy(
-                            elements = stateSite.elements + UISiteElementModel(
+                            elements = stateSite.elements + ElementModel(
                                 id = Uuid.generateV4(), key = "", value = ""
                             )
                         )

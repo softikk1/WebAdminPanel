@@ -11,5 +11,5 @@ data class SiteModel(
     val host: String,
     val description: String,
     val createAt: LocalDateTime,
-    val elements: List<UISiteElementModel> = emptyList()
+    val elements: List<ElementModel>
 )

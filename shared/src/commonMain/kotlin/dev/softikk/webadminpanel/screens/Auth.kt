@@ -14,6 +14,8 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,16 +38,25 @@ import dev.softikk.webadminpanel.TextFieldPlaceEmailAuth
 import dev.softikk.webadminpanel.TextFieldPlacePasswordAuth
 import dev.softikk.webadminpanel.TitleAuth
 import dev.softikk.webadminpanel.components.WebTextField
+import dev.softikk.webadminpanel.viewmodels.AuthViewModel
 import dev.softikk.webkit.components.buttons.Button
 import dev.softikk.webkit.theme.DimensTheme
 
 private val MaxWidthBlankAuth = 400.dp
 
 @Composable
-fun Auth(navController: NavHostController) {
+fun Auth(navController: NavHostController, authViewModel: AuthViewModel) {
     val stateTextFieldEmail = rememberTextFieldState()
     val stateTextFieldPassword = rememberTextFieldState()
     var checked by remember { mutableStateOf(false) }
+
+    val isLogin by authViewModel.isLogin.collectAsState()
+
+    LaunchedEffect(isLogin) {
+        if (isLogin) {
+            navController.navigate(Routes.Main.Sites.route)
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
@@ -86,7 +97,10 @@ fun Auth(navController: NavHostController) {
             }
             Button(
                 modifier = Modifier.fillMaxWidth(), onClick = {
-                    navController.navigate(Routes.Main.Sites.route)
+                    authViewModel.login(
+                        email = stateTextFieldEmail.text.toString(),
+                        password = stateTextFieldPassword.text.toString()
+                    )
                 }, containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Text(

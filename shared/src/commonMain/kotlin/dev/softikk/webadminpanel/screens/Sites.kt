@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -24,11 +25,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import dev.softikk.webadminpanel.TestDatabase
 import dev.softikk.webadminpanel.components.SiteSelectWidget
 import dev.softikk.webadminpanel.components.SiteWidget
 import dev.softikk.webadminpanel.components.WebButton
 import dev.softikk.webadminpanel.viewmodels.AdminsViewModel
+import dev.softikk.webadminpanel.viewmodels.SitesViewModel
 import dev.softikk.webkit.theme.DimensTheme
 
 private val MinSizeColumnsSitesAndAdmins = 150.dp
@@ -37,9 +38,14 @@ private val HeightSelectButton = 50.dp
 
 @Composable
 fun Sites(
-    navController: NavHostController
+    navController: NavHostController, sitesViewModel: SitesViewModel
 ) {
-    val sites by TestDatabase.sites.collectAsState()
+    val sites by sitesViewModel.sites.collectAsState()
+
+    LaunchedEffect(Unit) {
+        sitesViewModel.getSites()
+    }
+
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -64,8 +70,16 @@ fun Sites(
 }
 
 @Composable
-fun SelectSites(adminsViewModel: AdminsViewModel, onClose: () -> Unit) {
-    val sites by TestDatabase.sites.collectAsState()
+fun SelectSites(
+    adminsViewModel: AdminsViewModel,
+    sitesViewModel: SitesViewModel,
+    onClose: () -> Unit
+) {
+    LaunchedEffect(Unit) {
+        sitesViewModel.getSites()
+    }
+
+    val sites by sitesViewModel.sites.collectAsState()
     val stateAdmin by adminsViewModel.stateAdmin.collectAsState()
     val selectedSites = remember { stateAdmin.sites.toMutableStateList() }
 
