@@ -1,0 +1,9 @@
+package dev.softikk.webadminpanel.dto.sites
+
+import dev.softikk.webadminpanel.models.SiteModel
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class GetSiteRespondDto(
+    val site: SiteModel
+)
