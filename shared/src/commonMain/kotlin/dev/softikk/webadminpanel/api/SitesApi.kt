@@ -46,7 +46,6 @@ class SitesApi(private val client: HttpClient) {
         return when (receive.status) {
             HttpStatusCode.OK -> receive.body<GetSitesRespondDto>().sites
             else -> {
-                println(receive.body<String>())
                 emptyList()
             }
         }
@@ -60,7 +59,7 @@ class SitesApi(private val client: HttpClient) {
     suspend fun updateSite(
         siteId: Uuid, name: String, host: String, description: String, elements: List<ElementModel>
     ) {
-        val receive = client.put("/sites/$siteId") {
+        client.put("/sites/$siteId") {
             contentType(ContentType.Application.Json)
             setBody(
                 UpdateSiteReceiveDto(
@@ -68,6 +67,5 @@ class SitesApi(private val client: HttpClient) {
                 )
             )
         }
-        println(receive.body<String>())
     }
 }

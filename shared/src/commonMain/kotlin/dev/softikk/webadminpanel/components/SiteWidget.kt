@@ -46,25 +46,11 @@ fun SiteWidget(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             shape = DimensTheme.shapes.mediumShape
         ).pointerHoverIcon(PointerIcon.Hand).clickable {
-
             navController.navigate(
                 Routes.Main.Sites.Details(
                     siteId = site.id
                 ).route
             )
-//                    adminsViewModel.setStateAdmin(
-//                        stateAdmin.copy(
-//                            sites = stateAdmin.sites - site
-//                        )
-//                    )
-//                } else {
-//                    adminsViewModel.setStateAdmin(
-//                        stateAdmin.copy(
-//                            sites = stateAdmin.sites + site
-//                        )
-//                    )
-
-
         }.background(MaterialTheme.colorScheme.surface)
     ) {
         Column(

@@ -35,9 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.savedstate.read
-import dev.softikk.webadminpanel.DefaultDescriptionNameSiteDetails
-import dev.softikk.webadminpanel.DefaultHostNameSiteDetails
-import dev.softikk.webadminpanel.DefaultSiteNameSiteDetails
 import dev.softikk.webadminpanel.TextButtonSiteDetails
 import dev.softikk.webadminpanel.TextFieldHostNameSiteDetails
 import dev.softikk.webadminpanel.TextFieldSiteDescriptionSiteDetails
@@ -46,7 +43,7 @@ import dev.softikk.webadminpanel.components.WebButton
 import dev.softikk.webadminpanel.components.WebTextField
 import dev.softikk.webadminpanel.components.WebTextFieldKeyValue
 import dev.softikk.webadminpanel.components.formatDateTimePlusZero
-import dev.softikk.webadminpanel.models.ElementModel
+import dev.softikk.webadminpanel.models.ElementUiModel
 import dev.softikk.webadminpanel.viewmodels.SitesViewModel
 import dev.softikk.webkit.theme.DimensTheme
 import kotlinx.datetime.number
@@ -70,18 +67,18 @@ fun SiteDetails(
         if (id == "null") null else id
     }
 
-    LaunchedEffect(Unit) {
+    val stateSite by sitesViewModel.stateSite.collectAsState()
+
+    val siteName = rememberTextFieldState()
+    val hostName = rememberTextFieldState()
+    val descriptionSite = rememberTextFieldState()
+    val elements = remember(stateSite.elements.toList()) { stateSite.elements.toMutableStateList() }
+
+    LaunchedEffect(siteId) {
         sitesViewModel.initStateSite(siteId)
     }
 
-    val stateSite by sitesViewModel.stateSite.collectAsState()
-
-    val siteName = rememberTextFieldState(initialText = DefaultSiteNameSiteDetails)
-    val hostName = rememberTextFieldState(initialText = DefaultHostNameSiteDetails)
-    val descriptionSite = rememberTextFieldState(initialText = DefaultDescriptionNameSiteDetails)
-    val elements = remember(stateSite.elements.toList()) { stateSite.elements.toMutableStateList() }
-
-    LaunchedEffect(Unit) {
+    LaunchedEffect(stateSite) {
         siteName.edit { replace(0, siteName.text.length, stateSite.siteName) }
         hostName.edit { replace(0, hostName.text.length, stateSite.host) }
         descriptionSite.edit {
@@ -128,11 +125,7 @@ fun SiteDetails(
                 )
                 siteId?.let {
                     Text(
-                        text = "${stateSite.createAt.time.hour.formatDateTimePlusZero()}:" +
-                                "${stateSite.createAt.time.minute.formatDateTimePlusZero()} " +
-                                "${stateSite.createAt.date.day.formatDateTimePlusZero()}." +
-                                "${stateSite.createAt.date.month.number.formatDateTimePlusZero()}." +
-                                stateSite.createAt.date.year.formatDateTimePlusZero(),
+                        text = "${stateSite.createAt.time.hour.formatDateTimePlusZero()}:" + "${stateSite.createAt.time.minute.formatDateTimePlusZero()} " + "${stateSite.createAt.date.day.formatDateTimePlusZero()}." + "${stateSite.createAt.date.month.number.formatDateTimePlusZero()}." + stateSite.createAt.date.year.formatDateTimePlusZero(),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -141,6 +134,7 @@ fun SiteDetails(
 
             IconButton(
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand), onClick = {
+                    sitesViewModel.clearStateSite()
                     navController.popBackStack()
                 }) {
                 Icon(
@@ -176,25 +170,29 @@ fun SiteDetails(
                 }
             }
             items(elements) { element ->
-                val key = element.key
-                val value = element.value
-                key(element.id) {
+                key(element.seqId) {
                     val keyTextFieldState = rememberTextFieldState(
-                        initialText = key
+                        initialText = element.key
                     )
                     val valueTextFieldState = rememberTextFieldState(
-                        initialText = value
+                        initialText = element.value
                     )
                     LaunchedEffect(keyTextFieldState.text, valueTextFieldState.text) {
-                        val elements = stateSite.elements.toMutableList()
-                        elements[elements.indexOf(element)] = ElementModel(
-                            id = element.id,
-                            key = keyTextFieldState.text.toString(),
-                            value = valueTextFieldState.text.toString()
-                        )
+                        val newElements = elements.map {
+                            if (it.seqId == element.seqId) {
+                                ElementUiModel(
+                                    id = element.id,
+                                    seqId = element.seqId,
+                                    key = keyTextFieldState.text.toString(),
+                                    value = valueTextFieldState.text.toString()
+                                )
+                            } else {
+                                it
+                            }
+                        }
                         sitesViewModel.setStateSite(
                             stateSite.copy(
-                                elements = elements
+                                elements = newElements
                             )
                         )
                     }
@@ -241,8 +239,8 @@ fun SiteDetails(
                 ), containerColor = MaterialTheme.colorScheme.surface, onClick = {
                     sitesViewModel.setStateSite(
                         stateSite.copy(
-                            elements = stateSite.elements + ElementModel(
-                                id = Uuid.generateV4(), key = "", value = ""
+                            elements = stateSite.elements + ElementUiModel(
+                                id = null, seqId = Uuid.generateV4(), key = "", value = ""
                             )
                         )
                     )

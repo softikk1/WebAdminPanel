@@ -21,6 +21,7 @@ class AdminsViewModel(private val adminsApi: AdminsApi) : ViewModel() {
 
     fun initStateAdmin(adminId: String?) {
         viewModelScope.launch {
+            clearStateAdmin()
             val admins = adminsApi.getAdmins()
             val adminId = adminId?.let { Uuid.parse(it) }
             _stateAdmin.update {

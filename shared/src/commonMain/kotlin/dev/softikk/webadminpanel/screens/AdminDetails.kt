@@ -76,33 +76,25 @@ fun AdminDetails(
         if (id == "null") null else id
     }
 
-    LaunchedEffect(Unit) {
-        adminsViewModel.initStateAdmin(adminId)
-    }
-
-    val admin by adminsViewModel.stateAdmin.collectAsState()
+    val stateAdmin by adminsViewModel.stateAdmin.collectAsState()
 
     val adminName = rememberTextFieldState()
     val email = rememberTextFieldState()
     val password = rememberTextFieldState()
 
-    LaunchedEffect(Unit) {
-        adminName.edit {
-            replace(0, length, admin.name)
-        }
+    LaunchedEffect(adminId) {
+        adminsViewModel.initStateAdmin(adminId)
+    }
 
-        email.edit {
-            replace(0, length, admin.email)
-        }
-
-        password.edit {
-            replace(0, length, admin.password)
-        }
+    LaunchedEffect(stateAdmin) {
+        adminName.edit { replace(0, length, stateAdmin.name) }
+        email.edit { replace(0, length, stateAdmin.email) }
+        password.edit { replace(0, length, stateAdmin.password) }
     }
 
     LaunchedEffect(adminName.text, email.text, password.text) {
         adminsViewModel.setStateAdmin(
-            admin.copy(
+            stateAdmin.copy(
                 name = adminName.text.toString(),
                 email = email.text.toString(),
                 password = password.text.toString()
@@ -130,18 +122,19 @@ fun AdminDetails(
                     verticalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
                 ) {
                     Text(
-                        text = admin.name,
+                        text = stateAdmin.name,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = admin.email,
+                        text = stateAdmin.email,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
                 IconButton(
                     modifier = Modifier.pointerHoverIcon(PointerIcon.Hand), onClick = {
+                        adminsViewModel.clearStateAdmin()
                         navController.popBackStack()
                     }) {
                     Icon(
@@ -156,7 +149,7 @@ fun AdminDetails(
                 modifier = Modifier.height(SitesHeight),
                 horizontalArrangement = Arrangement.spacedBy(DimensTheme.paddings.mediumPadding)
             ) {
-                items(admin.sites) { site ->
+                items(stateAdmin.sites) { site ->
                     Box(
                         modifier = Modifier.weight(1f).dropShadow(
                             shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
@@ -196,8 +189,8 @@ fun AdminDetails(
                             }
                             IconButton({
                                 adminsViewModel.setStateAdmin(
-                                    admin.copy(
-                                        sites = admin.sites - site
+                                    stateAdmin.copy(
+                                        sites = stateAdmin.sites - site
                                     )
                                 )
                             }) {

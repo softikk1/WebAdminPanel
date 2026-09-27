@@ -12,6 +12,6 @@ data class SiteScreenModel(
     val siteName: String = DefaultSiteNameSiteDetails,
     val host: String = DefaultHostNameSiteDetails,
     val description: String = DefaultDescriptionNameSiteDetails,
-    val elements: List<ElementModel> = emptyList(),
+    val elements: List<ElementUiModel> = emptyList(),
     val createAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC)
 )
