@@ -96,7 +96,10 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
         )
     }
     val sitesViewModel = viewModel { SitesViewModel(SitesApi(client)) }
-    val adminsViewModel = viewModel { AdminsViewModel(AdminsApi(client)) }
+    val adminsViewModel = viewModel { AdminsViewModel(AdminsApi(
+        client = client,
+        authDataStore = authDataStore
+    )) }
 
     val navController = rememberNavController()
 
