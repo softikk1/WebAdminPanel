@@ -35,7 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.savedstate.read
-import dev.softikk.webadminpanel.TextButtonSiteDetails
+import dev.softikk.webadminpanel.TextButtonSiteDetailsDeleteSite
+import dev.softikk.webadminpanel.TextButtonSiteDetailsSave
 import dev.softikk.webadminpanel.TextFieldHostNameSiteDetails
 import dev.softikk.webadminpanel.TextFieldSiteDescriptionSiteDetails
 import dev.softikk.webadminpanel.TextFieldSiteNameSiteDetails
@@ -205,52 +206,74 @@ fun SiteDetails(
                 }
             }
         }
-        Row(
+        Column(
             modifier = Modifier.widthIn(max = MaxWidthTextFieldSiteDetails)
                 .padding(bottom = DimensTheme.paddings.mediumPadding),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
+            verticalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
         ) {
-            WebButton(
-                modifier = Modifier.height(50.dp).weight(1f), onClick = {
-                    sitesViewModel.saveSite(siteId)
-                    sitesViewModel.clearStateSite()
-                    navController.popBackStack()
-                }) {
-                Text(
-                    text = TextButtonSiteDetails,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.surface
-                )
-            }
-            WebButton(
-                modifier = Modifier.size(50.dp).dropShadow(
-                    shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
-                        radius = 8.dp,
-                        offset = DpOffset(0.dp, 1.dp),
-                        color = MaterialTheme.colorScheme.onSurface.copy(
-                            0.1f
-                        )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
+            ) {
+                WebButton(
+                    modifier = Modifier.height(50.dp).weight(1f), onClick = {
+                        sitesViewModel.saveSite(siteId)
+                        sitesViewModel.clearStateSite()
+                        navController.popBackStack()
+                    }) {
+                    Text(
+                        text = TextButtonSiteDetailsSave,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.surface
                     )
-                ).clip(DimensTheme.shapes.mediumShape).pointerHoverIcon(PointerIcon.Hand).border(
-                    width = 1.dp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                        0.1f
-                    ), shape = DimensTheme.shapes.mediumShape
-                ), containerColor = MaterialTheme.colorScheme.surface, onClick = {
-                    sitesViewModel.setStateSite(
-                        stateSite.copy(
-                            elements = stateSite.elements + ElementUiModel(
-                                id = null, seqId = Uuid.generateV4(), key = "", value = ""
+                }
+                WebButton(
+                    modifier = Modifier.size(50.dp).dropShadow(
+                        shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
+                            radius = 8.dp,
+                            offset = DpOffset(0.dp, 1.dp),
+                            color = MaterialTheme.colorScheme.onSurface.copy(
+                                0.1f
                             )
                         )
+                    ).clip(DimensTheme.shapes.mediumShape).pointerHoverIcon(PointerIcon.Hand)
+                        .border(
+                            width = 1.dp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                0.1f
+                            ), shape = DimensTheme.shapes.mediumShape
+                        ), containerColor = MaterialTheme.colorScheme.surface, onClick = {
+                        sitesViewModel.setStateSite(
+                            stateSite.copy(
+                                elements = stateSite.elements + ElementUiModel(
+                                    id = null, seqId = Uuid.generateV4(), key = "", value = ""
+                                )
+                            )
+                        )
+                    }) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = vectorResource(Res.drawable.plus),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
-                }) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    imageVector = vectorResource(Res.drawable.plus),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
+                }
+            }
+
+            siteId?.let {
+                WebButton(
+                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                    containerColor = MaterialTheme.colorScheme.error,
+                    onClick = {
+                        sitesViewModel.deleteSite(Uuid.parse(siteId))
+                        sitesViewModel.clearStateSite()
+                        navController.popBackStack()
+                    }) {
+                    Text(
+                        text = TextButtonSiteDetailsDeleteSite,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.surface
+                    )
+                }
             }
         }
     }

@@ -8,6 +8,7 @@ import dev.softikk.webadminpanel.models.ElementModel
 import dev.softikk.webadminpanel.models.SiteModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
@@ -67,5 +68,11 @@ class SitesApi(private val client: HttpClient) {
                 )
             )
         }
+    }
+
+    suspend fun deleteSite(
+        siteId: Uuid
+    ) {
+        client.delete("/sites/$siteId")
     }
 }

@@ -93,4 +93,10 @@ class SitesViewModel(private val sitesApi: SitesApi) : ViewModel() {
             }
         }
     }
+
+    fun deleteSite(siteId: Uuid) {
+        viewModelScope.launch {
+            sitesApi.deleteSite(siteId)
+        }
+    }
 }

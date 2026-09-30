@@ -43,7 +43,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.savedstate.read
 import dev.softikk.webadminpanel.Routes
-import dev.softikk.webadminpanel.TextButtonSiteDetails
+import dev.softikk.webadminpanel.TextButtonSiteDetailsSave
 import dev.softikk.webadminpanel.TextFieldAdminNameAdminDetails
 import dev.softikk.webadminpanel.TextFieldEmailAdminDetails
 import dev.softikk.webadminpanel.TextFieldPasswordAdminDetails
@@ -271,7 +271,7 @@ fun AdminDetails(
                         navController.popBackStack()
                     }) {
                     Text(
-                        text = TextButtonSiteDetails,
+                        text = TextButtonSiteDetailsSave,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.surface
                     )

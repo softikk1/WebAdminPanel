@@ -138,7 +138,8 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
                     surface = Color(0xFFFFFFFF),
                     onSurface = Color(0xFF000000),
                     onSurfaceVariant = Color(0xFF8B8B8B),
-                    surfaceContainer = Color(0xFFEBEBEB)
+                    surfaceContainer = Color(0xFFEBEBEB),
+                    error = Color.Red
                 ), dimens = Dimens(
                     shapes = Shapes(
                         mediumShape = RoundedCornerShape(10.dp),
