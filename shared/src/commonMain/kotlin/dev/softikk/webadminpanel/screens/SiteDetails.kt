@@ -227,8 +227,6 @@ fun SiteDetails(
                                 color = MaterialTheme.colorScheme.surface
                             ), containerColor = MaterialTheme.colorScheme.surface, onClick = {
                                 sitesViewModel.deleteSchema(
-                                    siteId = siteId?.let { Uuid.parse(siteId) },
-                                    schemaId = element.id,
                                     seqId = element.seqId
                                 )
                             }) {
