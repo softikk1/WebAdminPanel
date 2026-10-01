@@ -99,4 +99,23 @@ class SitesViewModel(private val sitesApi: SitesApi) : ViewModel() {
             sitesApi.deleteSite(siteId)
         }
     }
+
+    fun deleteSchema(siteId: Uuid?, schemaId: Uuid?, seqId: Uuid) {
+        viewModelScope.launch {
+            if ((siteId != null) && (schemaId != null)) {
+                sitesApi.deleteSchema(
+                    siteId = siteId, schemaId = schemaId, onSuccess = {
+                        _stateSite.update {
+                            it.copy(
+                                elements = _stateSite.value.elements.filter { elementUiModel -> elementUiModel.seqId != seqId })
+                        }
+                    })
+            } else {
+                _stateSite.update {
+                    it.copy(
+                        elements = _stateSite.value.elements.filter { elementUiModel -> elementUiModel.seqId != seqId })
+                }
+            }
+        }
+    }
 }

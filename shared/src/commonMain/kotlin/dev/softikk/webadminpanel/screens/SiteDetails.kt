@@ -1,5 +1,6 @@
 package dev.softikk.webadminpanel.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,11 +52,16 @@ import kotlinx.datetime.number
 import org.jetbrains.compose.resources.vectorResource
 import webadminpanel.shared.generated.resources.Res
 import webadminpanel.shared.generated.resources.plus
+import webadminpanel.shared.generated.resources.trash
 import webadminpanel.shared.generated.resources.x
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 private val MaxWidthTextFieldSiteDetails = 400.dp
+private val SizeSquareButton = 50.dp
+private val HeightElements = 50.dp
+private val SizeIcon = 24.dp
+private val WebButtonShadowRadius = 6.dp
 
 @OptIn(ExperimentalUuidApi::class)
 @Composable
@@ -198,11 +204,42 @@ fun SiteDetails(
                         )
                     }
 
-                    WebTextFieldKeyValue(
-                        modifier = Modifier.fillMaxWidth(),
-                        keyTextFieldState = keyTextFieldState,
-                        valueTextFieldState = valueTextFieldState
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
+                    ) {
+                        WebTextFieldKeyValue(
+                            modifier = Modifier.height(HeightElements).weight(1f),
+                            keyTextFieldState = keyTextFieldState,
+                            valueTextFieldState = valueTextFieldState
+                        )
+                        WebButton(
+                            modifier = Modifier.size(SizeSquareButton).dropShadow(
+                                shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
+                                    radius = WebButtonShadowRadius,
+                                    offset = DpOffset(0.dp, 1.dp),
+                                    color = MaterialTheme.colorScheme.onSurface.copy(0.1f)
+                                )
+                            ).clip(DimensTheme.shapes.mediumShape).border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.surfaceContainer,
+                                shape = DimensTheme.shapes.mediumShape
+                            ).background(
+                                color = MaterialTheme.colorScheme.surface
+                            ), containerColor = MaterialTheme.colorScheme.surface, onClick = {
+                                sitesViewModel.deleteSchema(
+                                    siteId = siteId?.let { Uuid.parse(siteId) },
+                                    schemaId = element.id,
+                                    seqId = element.seqId
+                                )
+                            }) {
+                            Icon(
+                                modifier = Modifier.size(SizeIcon),
+                                imageVector = vectorResource(Res.drawable.trash),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -216,7 +253,7 @@ fun SiteDetails(
                 horizontalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
             ) {
                 WebButton(
-                    modifier = Modifier.height(50.dp).weight(1f), onClick = {
+                    modifier = Modifier.height(HeightElements).weight(1f), onClick = {
                         sitesViewModel.saveSite(siteId)
                         sitesViewModel.clearStateSite()
                         navController.popBackStack()
@@ -228,7 +265,7 @@ fun SiteDetails(
                     )
                 }
                 WebButton(
-                    modifier = Modifier.size(50.dp).dropShadow(
+                    modifier = Modifier.size(SizeSquareButton).dropShadow(
                         shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
                             radius = 8.dp,
                             offset = DpOffset(0.dp, 1.dp),
@@ -251,7 +288,7 @@ fun SiteDetails(
                         )
                     }) {
                     Icon(
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(SizeIcon),
                         imageVector = vectorResource(Res.drawable.plus),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurface
@@ -261,7 +298,7 @@ fun SiteDetails(
 
             siteId?.let {
                 WebButton(
-                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                    modifier = Modifier.height(HeightElements).fillMaxWidth(),
                     containerColor = MaterialTheme.colorScheme.error,
                     onClick = {
                         sitesViewModel.deleteSite(Uuid.parse(siteId))

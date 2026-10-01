@@ -75,4 +75,13 @@ class SitesApi(private val client: HttpClient) {
     ) {
         client.delete("/sites/$siteId")
     }
+
+    suspend fun deleteSchema(
+        siteId: Uuid, schemaId: Uuid, onSuccess: () -> Unit
+    ) {
+        val receive = client.delete("/sites/$siteId/schemas/$schemaId")
+        if (receive.status == HttpStatusCode.OK) {
+            onSuccess()
+        }
+    }
 }
