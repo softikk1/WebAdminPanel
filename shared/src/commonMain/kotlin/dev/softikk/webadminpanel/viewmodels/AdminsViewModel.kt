@@ -88,4 +88,10 @@ class AdminsViewModel(private val adminsApi: AdminsApi) : ViewModel() {
             }
         }
     }
+
+    fun deleteAdmin(adminId: Uuid) {
+        viewModelScope.launch {
+            adminsApi.deleteAdmin(adminId)
+        }
+    }
 }

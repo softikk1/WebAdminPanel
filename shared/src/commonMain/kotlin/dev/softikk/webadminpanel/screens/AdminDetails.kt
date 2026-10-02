@@ -43,6 +43,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.savedstate.read
 import dev.softikk.webadminpanel.Routes
+import dev.softikk.webadminpanel.TextButtonSiteDetailsDeleteSite
 import dev.softikk.webadminpanel.TextButtonSiteDetailsSave
 import dev.softikk.webadminpanel.TextFieldAdminNameAdminDetails
 import dev.softikk.webadminpanel.TextFieldEmailAdminDetails
@@ -57,12 +58,14 @@ import webadminpanel.shared.generated.resources.Res
 import webadminpanel.shared.generated.resources.plus
 import webadminpanel.shared.generated.resources.x
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 private val MaxWidthAdminDetails = 400.dp
 private val HeightSaveButton = 50.dp
 private val SiteWidgetShadowRadius = 6.dp
 private val SitesHeight = 90.dp
 private val IconDeleteSiteSize = 24.dp
+private val HeightElements = 50.dp
 
 @OptIn(ExperimentalUuidApi::class)
 @Composable
@@ -259,10 +262,10 @@ fun AdminDetails(
                 }
             }
 
-            Box(
+            Column(
                 modifier = Modifier.widthIn(max = MaxWidthAdminDetails)
                     .padding(bottom = DimensTheme.paddings.mediumPadding),
-                contentAlignment = Alignment.Center
+                verticalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
             ) {
                 WebButton(
                     modifier = Modifier.height(HeightSaveButton).fillMaxWidth(), onClick = {
@@ -275,6 +278,22 @@ fun AdminDetails(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.surface
                     )
+                }
+                adminId?.let {
+                    WebButton(
+                        modifier = Modifier.height(HeightElements).fillMaxWidth(),
+                        containerColor = MaterialTheme.colorScheme.error,
+                        onClick = {
+                            adminsViewModel.deleteAdmin(Uuid.parse(adminId))
+                            adminsViewModel.clearStateAdmin()
+                            navController.popBackStack()
+                        }) {
+                        Text(
+                            text = TextButtonSiteDetailsDeleteSite,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.surface
+                        )
+                    }
                 }
             }
         }
