@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class AdminsViewModel(private val adminsApi: AdminsApi) : ViewModel() {
@@ -65,7 +64,6 @@ class AdminsViewModel(private val adminsApi: AdminsApi) : ViewModel() {
         _stateAdmin.update { AdminScreenModel() }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     fun saveAdmin(adminId: String?) {
         viewModelScope.launch {
             val stateAdminReceive = _stateAdmin.value
@@ -97,7 +95,11 @@ class AdminsViewModel(private val adminsApi: AdminsApi) : ViewModel() {
 
     fun searchAdmins(search: String) {
         viewModelScope.launch {
-            _admins.value = adminsApi.searchAdmins(search)
+            try {
+                _admins.value = adminsApi.searchAdmins(search)
+            } catch (_: Exception) {
+
+            }
         }
     }
 }
