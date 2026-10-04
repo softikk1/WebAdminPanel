@@ -14,6 +14,17 @@ class AuthViewModel(private val authApi: AuthApi, private val authDataStore: Aut
     private val _isLogin = MutableStateFlow(false)
     val isLogin = _isLogin.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            val authModel = authDataStore.getAuthModel()
+            authModel?.let {
+                login(
+                    email = authModel.email, password = authModel.password
+                )
+            }
+        }
+    }
+
     fun login(email: String, password: String) {
         viewModelScope.launch {
             val isLoginReceive = authApi.login(

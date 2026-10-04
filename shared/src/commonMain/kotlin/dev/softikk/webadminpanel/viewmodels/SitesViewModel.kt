@@ -3,6 +3,8 @@ package dev.softikk.webadminpanel.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.softikk.webadminpanel.api.SitesApi
+import dev.softikk.webadminpanel.models.SchemaModel
+import dev.softikk.webadminpanel.models.SchemaUIModel
 import dev.softikk.webadminpanel.models.SiteModel
 import dev.softikk.webadminpanel.models.SiteScreenModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,24 +21,27 @@ class SitesViewModel(private val sitesApi: SitesApi) : ViewModel() {
     private val _sites = MutableStateFlow<List<SiteModel>>(emptyList())
     val sites = _sites.asStateFlow()
 
+    @OptIn(ExperimentalUuidApi::class)
     fun initStateSite(siteId: String?) {
         viewModelScope.launch {
-            val sites = sitesApi.getSites()
-            val siteId = siteId?.let { Uuid.parse(it) }
+            clearStateSite()
             _stateSite.update {
-                if ((siteId != null) and (siteId in sites.map { site -> site.id })) {
-                    val site = sites.singleOrNull { site -> siteId == site.id }
-                    if (site != null) {
-                        it.copy(
-                            siteName = site.name,
-                            host = site.host,
-                            description = site.description,
-                            elements = site.elements,
-                            createAt = site.createAt
-                        )
-                    } else {
-                        it
-                    }
+                if (siteId != null) {
+                    val site = sitesApi.getSite(Uuid.parse(siteId))
+                    it.copy(
+                        siteName = site.name,
+                        host = site.host,
+                        description = site.description,
+                        elements = site.elements.map { elementModel ->
+                            SchemaUIModel(
+                                id = elementModel.id,
+                                seqId = Uuid.generateV4(),
+                                key = elementModel.key,
+                                value = elementModel.value
+                            )
+                        },
+                        createAt = site.createAt
+                    )
                 } else {
                     it
                 }
@@ -58,7 +63,6 @@ class SitesViewModel(private val sitesApi: SitesApi) : ViewModel() {
         _stateSite.update { SiteScreenModel() }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     fun saveSite(siteId: String?) {
         viewModelScope.launch {
             val siteId = siteId?.let { Uuid.parse(it) }
@@ -69,16 +73,44 @@ class SitesViewModel(private val sitesApi: SitesApi) : ViewModel() {
                     name = stateSiteReceive.siteName,
                     host = stateSiteReceive.host,
                     description = stateSiteReceive.description,
-                    elements = stateSiteReceive.elements
-                )
+                    elements = stateSiteReceive.elements.filter { it.key.isNotBlank() }.map {
+                        SchemaModel(
+                            id = it.id, key = it.key, value = it.value
+                        )
+                    })
             } else {
                 sitesApi.updateSite(
                     siteId = siteId,
                     name = stateSiteReceive.siteName,
                     host = stateSiteReceive.host,
                     description = stateSiteReceive.description,
-                    elements = stateSiteReceive.elements.filter { it.key.isNotBlank() })
+                    elements = stateSiteReceive.elements.filter { it.key.isNotBlank() }.map {
+                        SchemaModel(
+                            id = it.id, key = it.key, value = it.value
+                        )
+                    })
             }
+        }
+    }
+
+    fun deleteSite(siteId: Uuid) {
+        viewModelScope.launch {
+            sitesApi.deleteSite(siteId)
+        }
+    }
+
+    fun deleteSchema(seqId: Uuid) {
+        viewModelScope.launch {
+            _stateSite.update {
+                it.copy(
+                    elements = _stateSite.value.elements.filter { elementUiModel -> elementUiModel.seqId != seqId })
+            }
+        }
+    }
+
+    fun searchSites(search: String) {
+        viewModelScope.launch {
+            _sites.value = sitesApi.searchSites(search)
         }
     }
 }

@@ -96,12 +96,20 @@ fun Auth(navController: NavHostController, authViewModel: AuthViewModel) {
                 )
             }
             Button(
-                modifier = Modifier.fillMaxWidth(), onClick = {
+                modifier = Modifier.fillMaxWidth(),
+                enabled = checked and stateTextFieldEmail.text.toString()
+                    .isNotBlank() and stateTextFieldPassword.text.toString().isNotBlank(),
+                onClick = {
                     authViewModel.login(
                         email = stateTextFieldEmail.text.toString(),
                         password = stateTextFieldPassword.text.toString()
                     )
-                }, containerColor = MaterialTheme.colorScheme.primary
+                },
+                containerColor = MaterialTheme.colorScheme.primary.copy(
+                    alpha = if (checked and stateTextFieldEmail.text.toString()
+                            .isNotBlank() and stateTextFieldPassword.text.toString().isNotBlank()
+                    ) 1f else 0.2f
+                )
             ) {
                 Text(
                     text = ButtonContinueText,

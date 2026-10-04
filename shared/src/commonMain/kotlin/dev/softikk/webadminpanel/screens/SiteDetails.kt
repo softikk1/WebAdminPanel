@@ -1,5 +1,6 @@
 package dev.softikk.webadminpanel.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,10 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.savedstate.read
-import dev.softikk.webadminpanel.DefaultDescriptionNameSiteDetails
-import dev.softikk.webadminpanel.DefaultHostNameSiteDetails
-import dev.softikk.webadminpanel.DefaultSiteNameSiteDetails
-import dev.softikk.webadminpanel.TextButtonSiteDetails
+import dev.softikk.webadminpanel.TextButtonSiteDetailsDeleteSite
+import dev.softikk.webadminpanel.TextButtonSiteDetailsSave
 import dev.softikk.webadminpanel.TextFieldHostNameSiteDetails
 import dev.softikk.webadminpanel.TextFieldSiteDescriptionSiteDetails
 import dev.softikk.webadminpanel.TextFieldSiteNameSiteDetails
@@ -46,18 +45,23 @@ import dev.softikk.webadminpanel.components.WebButton
 import dev.softikk.webadminpanel.components.WebTextField
 import dev.softikk.webadminpanel.components.WebTextFieldKeyValue
 import dev.softikk.webadminpanel.components.formatDateTimePlusZero
-import dev.softikk.webadminpanel.models.ElementModel
+import dev.softikk.webadminpanel.models.SchemaUIModel
 import dev.softikk.webadminpanel.viewmodels.SitesViewModel
 import dev.softikk.webkit.theme.DimensTheme
 import kotlinx.datetime.number
 import org.jetbrains.compose.resources.vectorResource
 import webadminpanel.shared.generated.resources.Res
 import webadminpanel.shared.generated.resources.plus
+import webadminpanel.shared.generated.resources.trash
 import webadminpanel.shared.generated.resources.x
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 private val MaxWidthTextFieldSiteDetails = 400.dp
+private val SizeSquareButton = 50.dp
+private val HeightElements = 50.dp
+private val SizeIcon = 24.dp
+private val WebButtonShadowRadius = 6.dp
 
 @OptIn(ExperimentalUuidApi::class)
 @Composable
@@ -70,18 +74,18 @@ fun SiteDetails(
         if (id == "null") null else id
     }
 
-    LaunchedEffect(Unit) {
+    val stateSite by sitesViewModel.stateSite.collectAsState()
+
+    val siteName = rememberTextFieldState()
+    val hostName = rememberTextFieldState()
+    val descriptionSite = rememberTextFieldState()
+    val elements = remember(stateSite.elements.toList()) { stateSite.elements.toMutableStateList() }
+
+    LaunchedEffect(siteId) {
         sitesViewModel.initStateSite(siteId)
     }
 
-    val stateSite by sitesViewModel.stateSite.collectAsState()
-
-    val siteName = rememberTextFieldState(initialText = DefaultSiteNameSiteDetails)
-    val hostName = rememberTextFieldState(initialText = DefaultHostNameSiteDetails)
-    val descriptionSite = rememberTextFieldState(initialText = DefaultDescriptionNameSiteDetails)
-    val elements = remember(stateSite.elements.toList()) { stateSite.elements.toMutableStateList() }
-
-    LaunchedEffect(Unit) {
+    LaunchedEffect(stateSite) {
         siteName.edit { replace(0, siteName.text.length, stateSite.siteName) }
         hostName.edit { replace(0, hostName.text.length, stateSite.host) }
         descriptionSite.edit {
@@ -128,11 +132,7 @@ fun SiteDetails(
                 )
                 siteId?.let {
                     Text(
-                        text = "${stateSite.createAt.time.hour.formatDateTimePlusZero()}:" +
-                                "${stateSite.createAt.time.minute.formatDateTimePlusZero()} " +
-                                "${stateSite.createAt.date.day.formatDateTimePlusZero()}." +
-                                "${stateSite.createAt.date.month.number.formatDateTimePlusZero()}." +
-                                stateSite.createAt.date.year.formatDateTimePlusZero(),
+                        text = "${stateSite.createAt.time.hour.formatDateTimePlusZero()}:" + "${stateSite.createAt.time.minute.formatDateTimePlusZero()} " + "${stateSite.createAt.date.day.formatDateTimePlusZero()}." + "${stateSite.createAt.date.month.number.formatDateTimePlusZero()}." + stateSite.createAt.date.year.formatDateTimePlusZero(),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -141,6 +141,7 @@ fun SiteDetails(
 
             IconButton(
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand), onClick = {
+                    sitesViewModel.clearStateSite()
                     navController.popBackStack()
                 }) {
                 Icon(
@@ -176,83 +177,138 @@ fun SiteDetails(
                 }
             }
             items(elements) { element ->
-                val key = element.key
-                val value = element.value
-                key(element.id) {
+                key(element.seqId) {
                     val keyTextFieldState = rememberTextFieldState(
-                        initialText = key
+                        initialText = element.key
                     )
                     val valueTextFieldState = rememberTextFieldState(
-                        initialText = value
+                        initialText = element.value
                     )
                     LaunchedEffect(keyTextFieldState.text, valueTextFieldState.text) {
-                        val elements = stateSite.elements.toMutableList()
-                        elements[elements.indexOf(element)] = ElementModel(
-                            id = element.id,
-                            key = keyTextFieldState.text.toString(),
-                            value = valueTextFieldState.text.toString()
-                        )
+                        val newElements = elements.map {
+                            if (it.seqId == element.seqId) {
+                                SchemaUIModel(
+                                    id = element.id,
+                                    seqId = element.seqId,
+                                    key = keyTextFieldState.text.toString(),
+                                    value = valueTextFieldState.text.toString()
+                                )
+                            } else {
+                                it
+                            }
+                        }
                         sitesViewModel.setStateSite(
                             stateSite.copy(
-                                elements = elements
+                                elements = newElements
                             )
                         )
                     }
 
-                    WebTextFieldKeyValue(
-                        modifier = Modifier.fillMaxWidth(),
-                        keyTextFieldState = keyTextFieldState,
-                        valueTextFieldState = valueTextFieldState
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
+                    ) {
+                        WebTextFieldKeyValue(
+                            modifier = Modifier.height(HeightElements).weight(1f),
+                            keyTextFieldState = keyTextFieldState,
+                            valueTextFieldState = valueTextFieldState
+                        )
+                        WebButton(
+                            modifier = Modifier.size(SizeSquareButton).dropShadow(
+                                shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
+                                    radius = WebButtonShadowRadius,
+                                    offset = DpOffset(0.dp, 1.dp),
+                                    color = MaterialTheme.colorScheme.onSurface.copy(0.1f)
+                                )
+                            ).clip(DimensTheme.shapes.mediumShape).border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.surfaceContainer,
+                                shape = DimensTheme.shapes.mediumShape
+                            ).background(
+                                color = MaterialTheme.colorScheme.surface
+                            ), containerColor = MaterialTheme.colorScheme.surface, onClick = {
+                                sitesViewModel.deleteSchema(
+                                    seqId = element.seqId
+                                )
+                            }) {
+                            Icon(
+                                modifier = Modifier.size(SizeIcon),
+                                imageVector = vectorResource(Res.drawable.trash),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
                 }
             }
         }
-        Row(
+        Column(
             modifier = Modifier.widthIn(max = MaxWidthTextFieldSiteDetails)
                 .padding(bottom = DimensTheme.paddings.mediumPadding),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
+            verticalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
         ) {
-            WebButton(
-                modifier = Modifier.height(50.dp).weight(1f), onClick = {
-                    sitesViewModel.saveSite(siteId)
-                    sitesViewModel.clearStateSite()
-                    navController.popBackStack()
-                }) {
-                Text(
-                    text = TextButtonSiteDetails,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.surface
-                )
-            }
-            WebButton(
-                modifier = Modifier.size(50.dp).dropShadow(
-                    shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
-                        radius = 8.dp,
-                        offset = DpOffset(0.dp, 1.dp),
-                        color = MaterialTheme.colorScheme.onSurface.copy(
-                            0.1f
-                        )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
+            ) {
+                WebButton(
+                    modifier = Modifier.height(HeightElements).weight(1f), onClick = {
+                        sitesViewModel.saveSite(siteId)
+                        sitesViewModel.clearStateSite()
+                        navController.popBackStack()
+                    }) {
+                    Text(
+                        text = TextButtonSiteDetailsSave,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.surface
                     )
-                ).clip(DimensTheme.shapes.mediumShape).pointerHoverIcon(PointerIcon.Hand).border(
-                    width = 1.dp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                        0.1f
-                    ), shape = DimensTheme.shapes.mediumShape
-                ), containerColor = MaterialTheme.colorScheme.surface, onClick = {
-                    sitesViewModel.setStateSite(
-                        stateSite.copy(
-                            elements = stateSite.elements + ElementModel(
-                                id = Uuid.generateV4(), key = "", value = ""
+                }
+                WebButton(
+                    modifier = Modifier.size(SizeSquareButton).dropShadow(
+                        shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
+                            radius = 8.dp,
+                            offset = DpOffset(0.dp, 1.dp),
+                            color = MaterialTheme.colorScheme.onSurface.copy(
+                                0.1f
                             )
                         )
+                    ).clip(DimensTheme.shapes.mediumShape).pointerHoverIcon(PointerIcon.Hand)
+                        .border(
+                            width = 1.dp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                0.1f
+                            ), shape = DimensTheme.shapes.mediumShape
+                        ), containerColor = MaterialTheme.colorScheme.surface, onClick = {
+                        sitesViewModel.setStateSite(
+                            stateSite.copy(
+                                elements = stateSite.elements + SchemaUIModel(
+                                    id = null, seqId = Uuid.generateV4(), key = "", value = ""
+                                )
+                            )
+                        )
+                    }) {
+                    Icon(
+                        modifier = Modifier.size(SizeIcon),
+                        imageVector = vectorResource(Res.drawable.plus),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
-                }) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    imageVector = vectorResource(Res.drawable.plus),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
+                }
+            }
+
+            siteId?.let {
+                WebButton(
+                    modifier = Modifier.height(HeightElements).fillMaxWidth(),
+                    containerColor = MaterialTheme.colorScheme.error,
+                    onClick = {
+                        sitesViewModel.deleteSite(Uuid.parse(siteId))
+                        sitesViewModel.clearStateSite()
+                        navController.popBackStack()
+                    }) {
+                    Text(
+                        text = TextButtonSiteDetailsDeleteSite,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.surface
+                    )
+                }
             }
         }
     }

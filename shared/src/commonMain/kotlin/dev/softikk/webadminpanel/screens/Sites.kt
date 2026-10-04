@@ -46,7 +46,6 @@ fun Sites(
         sitesViewModel.getSites()
     }
 
-
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(DimensTheme.paddings.mediumPadding)

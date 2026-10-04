@@ -43,7 +43,8 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.savedstate.read
 import dev.softikk.webadminpanel.Routes
-import dev.softikk.webadminpanel.TextButtonSiteDetails
+import dev.softikk.webadminpanel.TextButtonSiteDetailsDeleteSite
+import dev.softikk.webadminpanel.TextButtonSiteDetailsSave
 import dev.softikk.webadminpanel.TextFieldAdminNameAdminDetails
 import dev.softikk.webadminpanel.TextFieldEmailAdminDetails
 import dev.softikk.webadminpanel.TextFieldPasswordAdminDetails
@@ -57,12 +58,14 @@ import webadminpanel.shared.generated.resources.Res
 import webadminpanel.shared.generated.resources.plus
 import webadminpanel.shared.generated.resources.x
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 private val MaxWidthAdminDetails = 400.dp
 private val HeightSaveButton = 50.dp
 private val SiteWidgetShadowRadius = 6.dp
 private val SitesHeight = 90.dp
 private val IconDeleteSiteSize = 24.dp
+private val HeightElements = 50.dp
 
 @OptIn(ExperimentalUuidApi::class)
 @Composable
@@ -76,33 +79,25 @@ fun AdminDetails(
         if (id == "null") null else id
     }
 
-    LaunchedEffect(Unit) {
-        adminsViewModel.initStateAdmin(adminId)
-    }
-
-    val admin by adminsViewModel.stateAdmin.collectAsState()
+    val stateAdmin by adminsViewModel.stateAdmin.collectAsState()
 
     val adminName = rememberTextFieldState()
     val email = rememberTextFieldState()
     val password = rememberTextFieldState()
 
-    LaunchedEffect(Unit) {
-        adminName.edit {
-            replace(0, length, admin.name)
-        }
+    LaunchedEffect(adminId) {
+        adminsViewModel.initStateAdmin(adminId)
+    }
 
-        email.edit {
-            replace(0, length, admin.email)
-        }
-
-        password.edit {
-            replace(0, length, admin.password)
-        }
+    LaunchedEffect(stateAdmin) {
+        adminName.edit { replace(0, length, stateAdmin.name) }
+        email.edit { replace(0, length, stateAdmin.email) }
+        password.edit { replace(0, length, stateAdmin.password) }
     }
 
     LaunchedEffect(adminName.text, email.text, password.text) {
         adminsViewModel.setStateAdmin(
-            admin.copy(
+            stateAdmin.copy(
                 name = adminName.text.toString(),
                 email = email.text.toString(),
                 password = password.text.toString()
@@ -130,18 +125,19 @@ fun AdminDetails(
                     verticalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
                 ) {
                     Text(
-                        text = admin.name,
+                        text = stateAdmin.name,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = admin.email,
+                        text = stateAdmin.email,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
                 IconButton(
                     modifier = Modifier.pointerHoverIcon(PointerIcon.Hand), onClick = {
+                        adminsViewModel.clearStateAdmin()
                         navController.popBackStack()
                     }) {
                     Icon(
@@ -156,7 +152,7 @@ fun AdminDetails(
                 modifier = Modifier.height(SitesHeight),
                 horizontalArrangement = Arrangement.spacedBy(DimensTheme.paddings.mediumPadding)
             ) {
-                items(admin.sites) { site ->
+                items(stateAdmin.sites) { site ->
                     Box(
                         modifier = Modifier.weight(1f).dropShadow(
                             shape = DimensTheme.shapes.mediumShape, shadow = Shadow(
@@ -196,8 +192,8 @@ fun AdminDetails(
                             }
                             IconButton({
                                 adminsViewModel.setStateAdmin(
-                                    admin.copy(
-                                        sites = admin.sites - site
+                                    stateAdmin.copy(
+                                        sites = stateAdmin.sites - site
                                     )
                                 )
                             }) {
@@ -266,10 +262,10 @@ fun AdminDetails(
                 }
             }
 
-            Box(
+            Column(
                 modifier = Modifier.widthIn(max = MaxWidthAdminDetails)
                     .padding(bottom = DimensTheme.paddings.mediumPadding),
-                contentAlignment = Alignment.Center
+                verticalArrangement = Arrangement.spacedBy(DimensTheme.paddings.smallPadding)
             ) {
                 WebButton(
                     modifier = Modifier.height(HeightSaveButton).fillMaxWidth(), onClick = {
@@ -278,10 +274,26 @@ fun AdminDetails(
                         navController.popBackStack()
                     }) {
                     Text(
-                        text = TextButtonSiteDetails,
+                        text = TextButtonSiteDetailsSave,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.surface
                     )
+                }
+                adminId?.let {
+                    WebButton(
+                        modifier = Modifier.height(HeightElements).fillMaxWidth(),
+                        containerColor = MaterialTheme.colorScheme.error,
+                        onClick = {
+                            adminsViewModel.deleteAdmin(Uuid.parse(adminId))
+                            adminsViewModel.clearStateAdmin()
+                            navController.popBackStack()
+                        }) {
+                        Text(
+                            text = TextButtonSiteDetailsDeleteSite,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.surface
+                        )
+                    }
                 }
             }
         }

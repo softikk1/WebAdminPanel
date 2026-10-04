@@ -75,7 +75,7 @@ fun WebTextField(
     ) {
         val isPassword = keyboardType == KeyboardType.Password
         if (isPassword) {
-            var showPassword by remember { mutableStateOf(true) }
+            var showPassword by remember { mutableStateOf(false) }
             Row(
                 modifier = Modifier.wrapContentSize(),
                 verticalAlignment = Alignment.CenterVertically,

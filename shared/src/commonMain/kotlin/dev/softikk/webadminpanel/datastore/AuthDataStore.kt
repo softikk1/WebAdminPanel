@@ -16,8 +16,6 @@ internal const val dataStoreFileName = "cms.preferences_pb"
 class AuthDataStore {
     private val dataStore = createDataStore()
 
-    private class PreferenceNotFoundException : NoSuchElementException("Preference not found")
-
     suspend fun setAuthModel(authModel: AuthDataStoreModel) {
         dataStore.updateData {
             it.toMutablePreferences().also { preferences ->
@@ -26,10 +24,12 @@ class AuthDataStore {
         }
     }
 
-    suspend fun getAuthModel(): AuthDataStoreModel {
+    suspend fun getAuthModel(): AuthDataStoreModel? {
         val preferences = dataStore.data.first()
-        return Json.decodeFromString<AuthDataStoreModel>(
-            preferences[DATA_AUTH] ?: throw PreferenceNotFoundException()
-        )
+        return preferences[DATA_AUTH]?.let {
+            Json.decodeFromString<AuthDataStoreModel?>(
+                it
+            )
+        }
     }
 }

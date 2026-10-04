@@ -23,7 +23,7 @@ import dev.softikk.webadminpanel.api.AdminsApi
 import dev.softikk.webadminpanel.api.AuthApi
 import dev.softikk.webadminpanel.api.SitesApi
 import dev.softikk.webadminpanel.components.WebToolbox
-import dev.softikk.webadminpanel.datastore.AuthDataStore
+import dev.softikk.webadminpanel.datastore.DataStoresInit
 import dev.softikk.webadminpanel.screens.AdminDetails
 import dev.softikk.webadminpanel.screens.Admins
 import dev.softikk.webadminpanel.screens.Auth
@@ -51,13 +51,11 @@ import org.jetbrains.compose.resources.Font
 import webadminpanel.shared.generated.resources.Res
 import webadminpanel.shared.generated.resources.inter
 import webadminpanel.shared.generated.resources.inter_italic
-import kotlin.uuid.ExperimentalUuidApi
 
-
-@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
-    val authDataStore = remember { AuthDataStore() }
+    val navController = rememberNavController()
+    val authDataStore = remember { DataStoresInit.authDataStore }
 
     val client = remember {
         HttpClient {
@@ -70,10 +68,15 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
                     credentials {
                         try {
                             val authDataStoreModel = authDataStore.getAuthModel()
-                            BasicAuthCredentials(
-                                username = authDataStoreModel.email,
-                                password = authDataStoreModel.password
-                            )
+                            if (authDataStoreModel != null) {
+                                BasicAuthCredentials(
+                                    username = authDataStoreModel.email,
+                                    password = authDataStoreModel.password
+                                )
+                            } else {
+                                navController.navigate(Routes.Auth.route)
+                                null
+                            }
                         } catch (_: Exception) {
                             null
                         }
@@ -96,9 +99,13 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
         )
     }
     val sitesViewModel = viewModel { SitesViewModel(SitesApi(client)) }
-    val adminsViewModel = viewModel { AdminsViewModel(AdminsApi(client)) }
-
-    val navController = rememberNavController()
+    val adminsViewModel = viewModel {
+        AdminsViewModel(
+            AdminsApi(
+                client = client, authDataStore = authDataStore
+            )
+        )
+    }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -123,7 +130,9 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
                         ) {
                             WebToolbox(
                                 modifier = Modifier.padding(top = DimensTheme.paddings.smallPadding),
-                                navController = navController
+                                navController = navController,
+                                sitesViewModel = sitesViewModel,
+                                adminsViewModel = adminsViewModel
                             )
                         }
                     }
@@ -135,7 +144,8 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
                     surface = Color(0xFFFFFFFF),
                     onSurface = Color(0xFF000000),
                     onSurfaceVariant = Color(0xFF8B8B8B),
-                    surfaceContainer = Color(0xFFEBEBEB)
+                    surfaceContainer = Color(0xFFEBEBEB),
+                    error = Color.Red
                 ), dimens = Dimens(
                     shapes = Shapes(
                         mediumShape = RoundedCornerShape(10.dp),
