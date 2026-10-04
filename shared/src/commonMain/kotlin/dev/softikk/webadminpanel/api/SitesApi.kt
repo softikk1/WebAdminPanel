@@ -1,10 +1,11 @@
 package dev.softikk.webadminpanel.api
 
-import dev.softikk.webadminpanel.dto.sites.CreateSiteReceiveDto
-import dev.softikk.webadminpanel.dto.sites.GetSiteRespondDto
-import dev.softikk.webadminpanel.dto.sites.GetSitesRespondDto
-import dev.softikk.webadminpanel.dto.sites.UpdateSiteReceiveDto
-import dev.softikk.webadminpanel.models.ElementModel
+import dev.softikk.webadminpanel.api.dto.sites.CreateSiteReceiveDto
+import dev.softikk.webadminpanel.api.dto.sites.GetSiteRespondDto
+import dev.softikk.webadminpanel.api.dto.sites.GetSitesRespondDto
+import dev.softikk.webadminpanel.api.dto.sites.SearchSitesRespondDto
+import dev.softikk.webadminpanel.api.dto.sites.UpdateSiteReceiveDto
+import dev.softikk.webadminpanel.models.SchemaModel
 import dev.softikk.webadminpanel.models.SiteModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -30,7 +31,7 @@ class SitesApi(private val client: HttpClient) {
     }
 
     suspend fun createSite(
-        name: String, host: String, description: String, elements: List<ElementModel>
+        name: String, host: String, description: String, elements: List<SchemaModel>
     ) {
         client.post("/site") {
             contentType(ContentType.Application.Json)
@@ -58,7 +59,7 @@ class SitesApi(private val client: HttpClient) {
     }
 
     suspend fun updateSite(
-        siteId: Uuid, name: String, host: String, description: String, elements: List<ElementModel>
+        siteId: Uuid, name: String, host: String, description: String, elements: List<SchemaModel>
     ) {
         client.put("/sites/$siteId") {
             contentType(ContentType.Application.Json)
@@ -74,5 +75,11 @@ class SitesApi(private val client: HttpClient) {
         siteId: Uuid
     ) {
         client.delete("/sites/$siteId")
+    }
+
+    suspend fun searchSites(search: String): List<SiteModel> {
+        return client.post("/sites/search") {
+            setBody(search)
+        }.body<SearchSitesRespondDto>().sites
     }
 }

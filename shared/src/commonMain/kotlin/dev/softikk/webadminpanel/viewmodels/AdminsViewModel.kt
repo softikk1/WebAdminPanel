@@ -94,4 +94,10 @@ class AdminsViewModel(private val adminsApi: AdminsApi) : ViewModel() {
             adminsApi.deleteAdmin(adminId)
         }
     }
+
+    fun searchAdmins(search: String) {
+        viewModelScope.launch {
+            _admins.value = adminsApi.searchAdmins(search)
+        }
+    }
 }

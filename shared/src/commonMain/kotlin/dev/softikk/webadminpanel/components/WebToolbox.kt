@@ -16,6 +16,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,12 +34,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import dev.softikk.webadminpanel.Routes
+import dev.softikk.webadminpanel.viewmodels.AdminsViewModel
+import dev.softikk.webadminpanel.viewmodels.SitesViewModel
 import dev.softikk.webkit.theme.DimensTheme
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.vectorResource
 import webadminpanel.shared.generated.resources.Res
 import webadminpanel.shared.generated.resources.plus
 import webadminpanel.shared.generated.resources.search
 import webadminpanel.shared.generated.resources.x
+import kotlin.time.Duration.Companion.milliseconds
 
 private val WebToolboxShadowRadius = 6.dp
 private val WebToolboxIconSize = 24.dp
@@ -52,7 +57,10 @@ private const val ToolboxSites = "Сайты"
 
 @Composable
 fun WebToolbox(
-    modifier: Modifier = Modifier, navController: NavHostController
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    sitesViewModel: SitesViewModel,
+    adminsViewModel: AdminsViewModel
 ) {
     var isSearch by remember { mutableStateOf(false) }
 
@@ -72,6 +80,16 @@ fun WebToolbox(
     ) {
         if (isSearch) {
             val searchTextFieldState = rememberTextFieldState()
+
+            LaunchedEffect(searchTextFieldState.text) {
+                delay(400.milliseconds)
+                if (currentRoute == Routes.Main.Admins.route) {
+                    adminsViewModel.searchAdmins(searchTextFieldState.text.toString())
+                }
+                if (currentRoute == Routes.Main.Sites.route) {
+                    sitesViewModel.searchSites(searchTextFieldState.text.toString())
+                }
+            }
 
             WebTextField(
                 state = searchTextFieldState,

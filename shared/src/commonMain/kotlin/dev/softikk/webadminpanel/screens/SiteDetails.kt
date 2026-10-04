@@ -45,7 +45,7 @@ import dev.softikk.webadminpanel.components.WebButton
 import dev.softikk.webadminpanel.components.WebTextField
 import dev.softikk.webadminpanel.components.WebTextFieldKeyValue
 import dev.softikk.webadminpanel.components.formatDateTimePlusZero
-import dev.softikk.webadminpanel.models.ElementUiModel
+import dev.softikk.webadminpanel.models.SchemaUIModel
 import dev.softikk.webadminpanel.viewmodels.SitesViewModel
 import dev.softikk.webkit.theme.DimensTheme
 import kotlinx.datetime.number
@@ -187,7 +187,7 @@ fun SiteDetails(
                     LaunchedEffect(keyTextFieldState.text, valueTextFieldState.text) {
                         val newElements = elements.map {
                             if (it.seqId == element.seqId) {
-                                ElementUiModel(
+                                SchemaUIModel(
                                     id = element.id,
                                     seqId = element.seqId,
                                     key = keyTextFieldState.text.toString(),
@@ -279,7 +279,7 @@ fun SiteDetails(
                         ), containerColor = MaterialTheme.colorScheme.surface, onClick = {
                         sitesViewModel.setStateSite(
                             stateSite.copy(
-                                elements = stateSite.elements + ElementUiModel(
+                                elements = stateSite.elements + SchemaUIModel(
                                     id = null, seqId = Uuid.generateV4(), key = "", value = ""
                                 )
                             )

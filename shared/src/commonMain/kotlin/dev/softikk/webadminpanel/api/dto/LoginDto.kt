@@ -1,4 +1,4 @@
-package dev.softikk.webadminpanel.dto
+package dev.softikk.webadminpanel.api.dto
 
 import kotlinx.serialization.Serializable
 

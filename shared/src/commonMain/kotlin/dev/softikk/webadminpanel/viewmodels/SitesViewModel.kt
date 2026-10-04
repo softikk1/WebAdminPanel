@@ -3,8 +3,8 @@ package dev.softikk.webadminpanel.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.softikk.webadminpanel.api.SitesApi
-import dev.softikk.webadminpanel.models.ElementModel
-import dev.softikk.webadminpanel.models.ElementUiModel
+import dev.softikk.webadminpanel.models.SchemaModel
+import dev.softikk.webadminpanel.models.SchemaUIModel
 import dev.softikk.webadminpanel.models.SiteModel
 import dev.softikk.webadminpanel.models.SiteScreenModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +33,7 @@ class SitesViewModel(private val sitesApi: SitesApi) : ViewModel() {
                         host = site.host,
                         description = site.description,
                         elements = site.elements.map { elementModel ->
-                            ElementUiModel(
+                            SchemaUIModel(
                                 id = elementModel.id,
                                 seqId = Uuid.generateV4(),
                                 key = elementModel.key,
@@ -63,7 +63,6 @@ class SitesViewModel(private val sitesApi: SitesApi) : ViewModel() {
         _stateSite.update { SiteScreenModel() }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     fun saveSite(siteId: String?) {
         viewModelScope.launch {
             val siteId = siteId?.let { Uuid.parse(it) }
@@ -75,7 +74,7 @@ class SitesViewModel(private val sitesApi: SitesApi) : ViewModel() {
                     host = stateSiteReceive.host,
                     description = stateSiteReceive.description,
                     elements = stateSiteReceive.elements.filter { it.key.isNotBlank() }.map {
-                        ElementModel(
+                        SchemaModel(
                             id = it.id, key = it.key, value = it.value
                         )
                     })
@@ -86,7 +85,7 @@ class SitesViewModel(private val sitesApi: SitesApi) : ViewModel() {
                     host = stateSiteReceive.host,
                     description = stateSiteReceive.description,
                     elements = stateSiteReceive.elements.filter { it.key.isNotBlank() }.map {
-                        ElementModel(
+                        SchemaModel(
                             id = it.id, key = it.key, value = it.value
                         )
                     })
@@ -106,6 +105,12 @@ class SitesViewModel(private val sitesApi: SitesApi) : ViewModel() {
                 it.copy(
                     elements = _stateSite.value.elements.filter { elementUiModel -> elementUiModel.seqId != seqId })
             }
+        }
+    }
+
+    fun searchSites(search: String) {
+        viewModelScope.launch {
+            _sites.value = sitesApi.searchSites(search)
         }
     }
 }

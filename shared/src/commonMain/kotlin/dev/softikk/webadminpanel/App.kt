@@ -130,7 +130,9 @@ fun App(onNavHostReady: (suspend (NavController) -> Unit)) {
                         ) {
                             WebToolbox(
                                 modifier = Modifier.padding(top = DimensTheme.paddings.smallPadding),
-                                navController = navController
+                                navController = navController,
+                                sitesViewModel = sitesViewModel,
+                                adminsViewModel = adminsViewModel
                             )
                         }
                     }

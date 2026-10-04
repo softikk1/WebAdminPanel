@@ -4,9 +4,8 @@ import kotlinx.serialization.Serializable
 import kotlin.uuid.Uuid
 
 @Serializable
-data class ElementUiModel(
+data class SchemaModel(
     val id: Uuid?,
-    val seqId: Uuid,
     val key: String,
     val value: String
 )

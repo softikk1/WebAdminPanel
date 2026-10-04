@@ -1,10 +1,11 @@
 package dev.softikk.webadminpanel.api
 
+import dev.softikk.webadminpanel.api.dto.admins.CreateAdminReceiveDto
+import dev.softikk.webadminpanel.api.dto.admins.GetAdminRespondDto
+import dev.softikk.webadminpanel.api.dto.admins.GetAdminsRespondDto
+import dev.softikk.webadminpanel.api.dto.admins.SearchAdminsRespondDto
+import dev.softikk.webadminpanel.api.dto.admins.UpdateAdminReceiveDto
 import dev.softikk.webadminpanel.datastore.AuthDataStore
-import dev.softikk.webadminpanel.dto.admins.CreateAdminReceiveDto
-import dev.softikk.webadminpanel.dto.admins.GetAdminRespondDto
-import dev.softikk.webadminpanel.dto.admins.GetAdminsRespondDto
-import dev.softikk.webadminpanel.dto.admins.UpdateAdminReceiveDto
 import dev.softikk.webadminpanel.models.AdminModel
 import dev.softikk.webadminpanel.models.AuthDataStoreModel
 import dev.softikk.webadminpanel.models.SiteModel
@@ -56,15 +57,23 @@ class AdminsApi(private val client: HttpClient, private val authDataStore: AuthD
         if (receive.status == HttpStatusCode.OK) {
             println("До обновления")
             println(email)
-            authDataStore.setAuthModel(AuthDataStoreModel(
-                email = email,
-                password = password
-            ))
+            authDataStore.setAuthModel(
+                AuthDataStoreModel(
+                    email = email,
+                    password = password
+                )
+            )
             println("Обновилось")
         }
     }
 
     suspend fun deleteAdmin(adminId: Uuid) {
         client.delete("/admins/$adminId")
+    }
+
+    suspend fun searchAdmins(search: String): List<AdminModel> {
+        return client.post("/admins/search") {
+            setBody(search)
+        }.body<SearchAdminsRespondDto>().admins
     }
 }
