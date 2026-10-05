@@ -22,31 +22,31 @@ class SitesViewModel(private val sitesApi: SitesApi) : ViewModel() {
     val sites = _sites.asStateFlow()
 
     @OptIn(ExperimentalUuidApi::class)
-    fun initStateSite(siteId: String?) {
-        viewModelScope.launch {
-            clearStateSite()
-            _stateSite.update {
-                if (siteId != null) {
-                    val site = sitesApi.getSite(Uuid.parse(siteId))
-                    it.copy(
-                        siteName = site.name,
-                        host = site.host,
-                        description = site.description,
-                        elements = site.elements.map { elementModel ->
-                            SchemaUIModel(
-                                id = elementModel.id,
-                                seqId = Uuid.generateV4(),
-                                key = elementModel.key,
-                                value = elementModel.value
-                            )
-                        },
-                        createAt = site.createAt
+    suspend fun initStateSite(siteId: String?): SiteScreenModel {
+        clearStateSite()
+        val siteScreenModel = if (siteId != null) {
+            val site = sitesApi.getSite(Uuid.parse(siteId))
+            _stateSite.value.copy(
+                siteName = site.name,
+                host = site.host,
+                description = site.description,
+                elements = site.elements.map { elementModel ->
+                    SchemaUIModel(
+                        id = elementModel.id,
+                        seqId = Uuid.generateV4(),
+                        key = elementModel.key,
+                        value = elementModel.value
                     )
-                } else {
-                    it
-                }
-            }
+                },
+                createAt = site.createAt
+            )
+        } else {
+            _stateSite.value
         }
+        _stateSite.update {
+            siteScreenModel
+        }
+        return siteScreenModel
     }
 
     fun getSites() {

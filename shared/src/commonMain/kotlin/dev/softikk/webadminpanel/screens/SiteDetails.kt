@@ -81,17 +81,15 @@ fun SiteDetails(
     val descriptionSite = rememberTextFieldState()
     val elements = remember(stateSite.elements.toList()) { stateSite.elements.toMutableStateList() }
 
-    LaunchedEffect(siteId) {
-        sitesViewModel.initStateSite(siteId)
-    }
-
-    LaunchedEffect(stateSite) {
-        siteName.edit { replace(0, siteName.text.length, stateSite.siteName) }
-        hostName.edit { replace(0, hostName.text.length, stateSite.host) }
-        descriptionSite.edit {
-            replace(
-                0, descriptionSite.text.length, stateSite.description
-            )
+    LaunchedEffect(Unit) {
+        sitesViewModel.initStateSite(siteId).also {
+            siteName.edit { replace(0, siteName.text.length, it.siteName) }
+            hostName.edit { replace(0, hostName.text.length, it.host) }
+            descriptionSite.edit {
+                replace(
+                    0, descriptionSite.text.length, it.description
+                )
+            }
         }
     }
 

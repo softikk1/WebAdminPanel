@@ -85,14 +85,12 @@ fun AdminDetails(
     val email = rememberTextFieldState()
     val password = rememberTextFieldState()
 
-    LaunchedEffect(adminId) {
-        adminsViewModel.initStateAdmin(adminId)
-    }
-
-    LaunchedEffect(stateAdmin) {
-        adminName.edit { replace(0, length, stateAdmin.name) }
-        email.edit { replace(0, length, stateAdmin.email) }
-        password.edit { replace(0, length, stateAdmin.password) }
+    LaunchedEffect(Unit) {
+        adminsViewModel.initStateAdmin(adminId).also {
+            adminName.edit { replace(0, length, it.name) }
+            email.edit { replace(0, length, it.email) }
+            password.edit { replace(0, length, it.password) }
+        }
     }
 
     LaunchedEffect(adminName.text, email.text, password.text) {

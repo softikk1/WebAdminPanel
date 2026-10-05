@@ -18,29 +18,30 @@ class AdminsViewModel(private val adminsApi: AdminsApi) : ViewModel() {
     private val _admins = MutableStateFlow<List<AdminModel>>(emptyList())
     val admins = _admins.asStateFlow()
 
-    fun initStateAdmin(adminId: String?) {
-        viewModelScope.launch {
-            clearStateAdmin()
-            val admins = adminsApi.getAdmins()
-            val adminId = adminId?.let { Uuid.parse(it) }
-            _stateAdmin.update {
-                if ((adminId != null) and (adminId in admins.map { admin -> admin.id })) {
-                    val adminReceive = admins.singleOrNull { admin -> adminId == admin.id }
-                    if (adminReceive != null) {
-                        it.copy(
-                            name = adminReceive.name,
-                            email = adminReceive.email,
-                            password = adminReceive.password,
-                            sites = adminReceive.sites
-                        )
-                    } else {
-                        it
-                    }
+    suspend fun initStateAdmin(adminId: String?): AdminScreenModel {
+        clearStateAdmin()
+        val admins = adminsApi.getAdmins()
+        val adminId = adminId?.let { Uuid.parse(it) }
+        val adminScreenModel =
+            if ((adminId != null) and (adminId in admins.map { admin -> admin.id })) {
+                val adminReceive = admins.singleOrNull { admin -> adminId == admin.id }
+                if (adminReceive != null) {
+                    _stateAdmin.value.copy(
+                        name = adminReceive.name,
+                        email = adminReceive.email,
+                        password = adminReceive.password,
+                        sites = adminReceive.sites
+                    )
                 } else {
-                    it
+                    _stateAdmin.value
                 }
+            } else {
+                _stateAdmin.value
             }
+        _stateAdmin.update {
+            adminScreenModel
         }
+        return adminScreenModel
     }
 
     fun getAdmins() {
